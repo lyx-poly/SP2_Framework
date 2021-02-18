@@ -12,6 +12,7 @@
 
 SceneTaxi::SceneTaxi()
 {
+	skybox_translateX = skybox_translateY = skybox_translateZ = 0.0f;
 }
 
 SceneTaxi::~SceneTaxi()
@@ -34,7 +35,7 @@ void SceneTaxi::Init()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	camera.Init(Vector3(-240, 10, -240), Vector3(0, 10, -240), Vector3(0, 1, 0));
+	camera.Init(Vector3(3, 1, 3), Vector3(0, 1, 0), Vector3(0, 1, 0));
 
 
 	// Animation Parameters
@@ -52,12 +53,50 @@ void SceneTaxi::Init()
 	meshList[GEO_FLOOR] = MeshBuilder::GenerateQuad("Floor", Color(1, 1, 1), 1.f);
 	meshList[GEO_FLOOR]->textureID = LoadTGA("Image//bottom1.tga");
 	
-	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("textBox", Color(1, 1, 1), 1.f);
-	meshList[GEO_QUAD]->textureID = LoadTGA("Image//textBox.tga");
+	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("textBox", Color(0, 1, 0), 1.f);
+	//meshList[GEO_QUAD]->textureID = LoadTGA("Image//textBox.tga");
+	meshList[GEO_QUAD]->material.kAmbient.Set(0.5f, 0.5f, 0.5f);
+	meshList[GEO_QUAD]->material.kDiffuse.Set(1.0f, 1.0f, 1.0f);
+	meshList[GEO_QUAD]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_QUAD]->material.kShininess = 0.2f;
 
 	meshList[GEO_LIGHTBALL] = MeshBuilder::GenerateSphere("sphere", Color(1,1,1), 18, 18, 1.0f);
+	meshList[GEO_TEXT] = MeshBuilder::GenerateText("Destination text", 16, 16);
+	meshList[GEO_TEXT]->textureID = LoadTGA("Image//calibri.tga");
 
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("reference", 1500, 1500, 1500);
+
+	// Road
+	meshList[GEO_ROAD] = MeshBuilder::GenerateOBJMTL("Taxi", "OBJ//road_straight.obj", "OBJ//road_straight.mtl");
+
+	// Hover Taxi
+	meshList[GEO_TAXI] = MeshBuilder::GenerateOBJMTL("Taxi", "OBJ//taxi.obj", "OBJ//taxi.mtl");
+	meshList[GEO_HOVER] = MeshBuilder::GenerateCube("Hoverpad", Color(0.5, 0.5, 0.5), 1.0f);
+	meshList[GEO_HOVER]->material.kAmbient.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_HOVER]->material.kDiffuse.Set(0.3f, 0.3f, 0.3f);
+	meshList[GEO_HOVER]->material.kSpecular.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_HOVER]->material.kShininess = 0.5f;
+
+	// Residential Buildings
+	//meshList[GEO_FLAT1] = MeshBuilder::GenerateOBJMTL("Flat_1", "OBJ//1.obj", "OBJ//1.mtl");
+	meshList[GEO_FLAT1] = MeshBuilder::GenerateCube("Placeholder Flat", Color(0.75, 0.75, 0.75), 1.0f);
+	meshList[GEO_FLAT1]->material.kAmbient.Set(0.5f, 0.5f, 0.5f);
+	meshList[GEO_FLAT1]->material.kDiffuse.Set(1.0f, 1.0f, 1.0f);
+	meshList[GEO_FLAT1]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_FLAT1]->material.kShininess = 1.f;
+
+	// Hospital
+	meshList[GEO_HOSPITAL] = MeshBuilder::GenerateCube("Placeholder Hospital", Color(1, 1, 1), 1.0f);
+	meshList[GEO_HOSPITAL]->material.kAmbient.Set(0.5f, 0.5f, 0.5f);
+	meshList[GEO_HOSPITAL]->material.kDiffuse.Set(1.0f, 1.0f, 1.0f);
+	meshList[GEO_HOSPITAL]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_HOSPITAL]->material.kShininess = 1.f;
+
+	meshList[GEO_RED_CROSS] = MeshBuilder::GenerateCube("Placeholder Cross", Color(1, 0, 0), 1.0f);
+	meshList[GEO_RED_CROSS]->material.kAmbient.Set(0.5f, 0.5f, 0.5f);
+	meshList[GEO_RED_CROSS]->material.kDiffuse.Set(1.0f, 1.0f, 1.0f);
+	meshList[GEO_RED_CROSS]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_RED_CROSS]->material.kShininess = 1.f;
 
 	// Skybox
 	meshList[GEO_FRONT] = MeshBuilder::GenerateQuad("front", Color(1, 1, 1), 1.f);
@@ -103,7 +142,7 @@ void SceneTaxi::Init()
 	m_parameters[U_LIGHT0_EXPONENT] = glGetUniformLocation(m_programID, "lights[0].exponent");
 	m_parameters[U_LIGHTENABLED] = glGetUniformLocation(m_programID, "lightEnabled");
 
-	//Second Light Parameters
+	/*//Second Light Parameters
 	m_parameters[U_LIGHT1_POSITION] = glGetUniformLocation(m_programID, "lights[1].position_cameraspace");
 	m_parameters[U_LIGHT1_COLOR] = glGetUniformLocation(m_programID, "lights[1].color");
 	m_parameters[U_LIGHT1_POWER] = glGetUniformLocation(m_programID, "lights[1].power");
@@ -129,7 +168,7 @@ void SceneTaxi::Init()
 	m_parameters[U_LIGHT2_COSCUTOFF] = glGetUniformLocation(m_programID, "lights[2].cosCutoff");
 	m_parameters[U_LIGHT2_COSINNER] = glGetUniformLocation(m_programID, "lights[2].cosInner");
 	m_parameters[U_LIGHT2_EXPONENT] = glGetUniformLocation(m_programID, "lights[2].exponent");
-	m_parameters[U_LIGHTENABLED] = glGetUniformLocation(m_programID, "lightEnabled");
+	m_parameters[U_LIGHTENABLED] = glGetUniformLocation(m_programID, "lightEnabled");*/
 
 	m_parameters[U_COLOR_TEXTURE_ENABLED] = glGetUniformLocation(m_programID, "colorTextureEnabled");
 	m_parameters[U_COLOR_TEXTURE] = glGetUniformLocation(m_programID, "colorTexture");
@@ -140,8 +179,8 @@ void SceneTaxi::Init()
 
 	glUseProgram(m_programID);
 
-	light[0].type = Light::LIGHT_DIRECTIONAL;
-	light[0].position.Set(0, 80, 50);
+	light[0].type = Light::LIGHT_POINT;
+	light[0].position.Set(0, 5, 0);
 	light[0].color.Set(0.4f, 0.4f, 1.f);
 	light[0].power = 0.4f;
 	light[0].kC = 1.f;
@@ -152,7 +191,7 @@ void SceneTaxi::Init()
 	light[0].exponent = 3.f;
 	light[0].spotDirection.Set(0.f, 1.f, 0.f);
 
-	light[1].type = Light::LIGHT_POINT;
+	/*light[1].type = Light::LIGHT_POINT;
 	light[1].position.Set(camera.position.x, 10, camera.position.z);
 	light[1].color.Set(1, 1, 1);
 	light[1].power = 2.0f;
@@ -172,7 +211,7 @@ void SceneTaxi::Init()
 	light[2].kQ = 0.001f;
 	light[2].cosCutoff = cos(Math::DegreeToRadian(45));
 	light[2].cosInner = cos(Math::DegreeToRadian(30));
-	light[2].exponent = 3.f;
+	light[2].exponent = 3.f;*/
 
 	// Make sure you pass uniform parameters after glUseProgram()
 	glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
@@ -185,7 +224,7 @@ void SceneTaxi::Init()
 	glUniform1f(m_parameters[U_LIGHT0_COSINNER], light[0].cosInner);
 	glUniform1f(m_parameters[U_LIGHT0_EXPONENT], light[0].exponent);
 
-	glUniform1i(m_parameters[U_LIGHT1_TYPE], light[1].type);
+	/*glUniform1i(m_parameters[U_LIGHT1_TYPE], light[1].type);
 	glUniform3fv(m_parameters[U_LIGHT1_COLOR], 1, &light[1].color.r);
 	glUniform1f(m_parameters[U_LIGHT1_POWER], light[1].power);
 	glUniform1f(m_parameters[U_LIGHT1_KC], light[1].kC);
@@ -203,7 +242,7 @@ void SceneTaxi::Init()
 	glUniform1f(m_parameters[U_LIGHT2_KQ], light[2].kQ);
 	glUniform1f(m_parameters[U_LIGHT2_COSCUTOFF], light[2].cosCutoff);
 	glUniform1f(m_parameters[U_LIGHT2_COSINNER], light[2].cosInner);
-	glUniform1f(m_parameters[U_LIGHT2_EXPONENT], light[2].exponent);
+	glUniform1f(m_parameters[U_LIGHT2_EXPONENT], light[2].exponent);*/
 
 	Mesh::SetMaterialLoc(m_parameters[U_MATERIAL_AMBIENT],
 		m_parameters[U_MATERIAL_DIFFUSE],
@@ -257,6 +296,41 @@ void SceneTaxi::Update(double dt)
 	glUniform1f(m_parameters[U_LIGHT2_POWER], light[2].power);
 	glUniform1i(m_parameters[U_LIGHT2_TYPE], light[2].type);
 
+	// Move lightball
+	static const float LSPEED = 4.f;
+
+	if (Application::IsKeyPressed('I'))
+		light[0].position.z -= (float)(LSPEED * dt);
+	if (Application::IsKeyPressed('K'))
+		light[0].position.z += (float)(LSPEED * dt);
+	if (Application::IsKeyPressed('J'))
+		light[0].position.x -= (float)(LSPEED * dt);
+	if (Application::IsKeyPressed('L'))
+		light[0].position.x += (float)(LSPEED * dt);
+	if (Application::IsKeyPressed('O'))
+		light[0].position.y -= (float)(LSPEED * dt);
+	if (Application::IsKeyPressed('P'))
+		light[0].position.y += (float)(LSPEED * dt);
+
+	/*// Skybox translate
+	if (Application::IsKeyPressed('W')) // z-
+		if (skybox_translateZ <= -250) { skybox_translateZ += (float)(5 * dt); }
+		else { skybox_translateZ -= (float)(25 * dt); }
+	if (Application::IsKeyPressed('S'))// z+
+		if (skybox_translateZ >= 250) { skybox_translateZ -= (float)(5 * dt); }
+		else { skybox_translateZ += (float)(25 * dt); }
+	if (Application::IsKeyPressed('A'))// x-
+		if (skybox_translateX <= -250) { skybox_translateX += (float)(5 * dt); }
+		else { skybox_translateX -= (float)(25 * dt); }
+	if (Application::IsKeyPressed('D'))// x+
+		if (skybox_translateX >= 250) { skybox_translateX -= (float)(5 * dt); }
+		else { skybox_translateX += (float)(25 * dt); }
+	if (Application::IsKeyPressed('Q'))// y-
+		if (skybox_translateY <= -250) { skybox_translateY += (float)(5 * dt); }
+		else { skybox_translateY -= (float)(25 * dt); }
+	if (Application::IsKeyPressed('E'))// y+
+		if (skybox_translateY >= 250) { skybox_translateY -= (float)(5 * dt); }
+		else { skybox_translateY += (float)(25 * dt); }*/
 
 	static bool bLButtonState = false;
 	if (!bLButtonState && Application::IsMousePressed(0))
@@ -319,7 +393,7 @@ void SceneTaxi::Render()
 		glUniform3fv(m_parameters[U_LIGHT0_POSITION], 1, &lightPosition_cameraspace.x);
 	}
 
-	if (light[1].type == Light::LIGHT_DIRECTIONAL)
+	/*if (light[1].type == Light::LIGHT_DIRECTIONAL)
 	{
 		Vector3 lightDir(light[1].position.x, light[1].position.y, light[1].position.z);
 		Vector3 lightDirection_cameraspace = viewStack.Top() * lightDir;
@@ -355,7 +429,7 @@ void SceneTaxi::Render()
 	{
 		Position lightPosition_cameraspace = viewStack.Top() * light[2].position;
 		glUniform3fv(m_parameters[U_LIGHT2_POSITION], 1, &lightPosition_cameraspace.x);
-	}
+	}*/
 
 	viewStack.LoadIdentity();
 	viewStack.LookAt(camera.position.x, camera.position.y, camera.position.z, camera.target.x, camera.target.y, camera.target.z, camera.up.x, camera.up.y, camera.up.z);
@@ -364,6 +438,101 @@ void SceneTaxi::Render()
 	RenderMesh(meshList[GEO_AXES], false);
 	RenderSkybox();
 
+	modelStack.PushMatrix();
+	modelStack.Translate(light[0].position.x, light[0].position.y,
+		light[0].position.z);
+	RenderMesh(meshList[GEO_LIGHTBALL], false);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Rotate(-90, 1, 0, 0);
+	modelStack.Scale(500,500,500);
+	RenderMesh(meshList[GEO_QUAD], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Rotate(90, 0, 1, 0);
+	modelStack.Scale(500, 1, 1);
+	RenderMesh(meshList[GEO_ROAD], true);
+	modelStack.PopMatrix();
+
+	// taxi
+	modelStack.PushMatrix();
+	modelStack.Translate(camera.up.x, camera.up.y, camera.up.z);
+	modelStack.Rotate(90, 0, 1, 0);
+	RenderMesh(meshList[GEO_TAXI], true);
+
+	modelStack.PushMatrix();
+	modelStack.Scale(1, 0.4f, 1.75);
+	modelStack.Translate(0, 0.5, 0);
+	RenderMesh(meshList[GEO_HOVER], true);
+
+	modelStack.PopMatrix();
+	modelStack.PopMatrix();
+
+	// Hospital
+
+	modelStack.PushMatrix();
+	modelStack.Scale(10,10,10);
+	modelStack.Rotate(-90, 0, 1, 0);
+	modelStack.Translate(-1, 0.5, -1);
+	RenderMesh(meshList[GEO_HOSPITAL], true);
+
+	modelStack.PushMatrix();
+	modelStack.Scale(0.1,0.35,0.1);
+	modelStack.Translate(-5, 0.9, 0);
+	RenderMesh(meshList[GEO_RED_CROSS], true);
+
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Scale(0.1, 0.1, 0.35);
+	modelStack.Translate(-5, 3.1, 0);
+	//modelStack.Rotate(45, 0, 0, 1);
+	RenderMesh(meshList[GEO_RED_CROSS], true);
+
+	modelStack.PopMatrix();
+	modelStack.PopMatrix();
+
+
+	// Residential District
+	modelStack.PushMatrix();
+	modelStack.Translate(-20, 0, -5);
+	modelStack.Scale(5, 20, 5);
+	modelStack.Translate(0, 0.5, 0);
+	RenderMesh(meshList[GEO_FLAT1], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-40, 0, -11);
+	modelStack.Scale(5, 20, 5);
+	modelStack.Translate(0, 0.5, 0);
+	RenderMesh(meshList[GEO_FLAT1], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-12, 0, -25);
+	modelStack.Scale(5, 20, 5);
+	modelStack.Translate(0, 0.5, 0);
+	RenderMesh(meshList[GEO_FLAT1], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-19, 0, -15);
+	modelStack.Scale(5, 20, 5);
+	modelStack.Translate(0, 0.5, 0);
+	RenderMesh(meshList[GEO_FLAT1], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-33, 0, -2);
+	modelStack.Scale(5, 20, 5);
+	modelStack.Translate(0, 0.5, 0);
+	RenderMesh(meshList[GEO_FLAT1], true);
+	modelStack.PopMatrix();
+
+	// Onscreen texy
+	RenderTextOnScreen(meshList[GEO_TEXT], "Destination: ", Color(0, 1, 0), 3, 0, 0);
 }
 
 void SceneTaxi::Exit()
@@ -420,6 +589,7 @@ void SceneTaxi::RenderMesh(Mesh* mesh, bool enableLight)
 void SceneTaxi::RenderSkybox()
 {
 	modelStack.PushMatrix();
+	modelStack.Translate(skybox_translateX, skybox_translateY, skybox_translateZ);
 	modelStack.Scale(1000, 1000, 1000);
 	modelStack.Translate(0, 0.f, 0.5);
 	modelStack.Rotate(0, 1, 0, 0);
@@ -428,6 +598,7 @@ void SceneTaxi::RenderSkybox()
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
+	modelStack.Translate(skybox_translateX, skybox_translateY, skybox_translateZ);
 	modelStack.Scale(1000, 1000, 1000);
 	modelStack.Translate(-0.5, 0.f, 0);
 	modelStack.Rotate(0, 1, 0, 0);
@@ -437,6 +608,7 @@ void SceneTaxi::RenderSkybox()
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
+	modelStack.Translate(skybox_translateX, skybox_translateY, skybox_translateZ);
 	modelStack.Scale(1000, 1000, 1000);
 	modelStack.Translate(0.5, 0.f, 0);
 	modelStack.Rotate(0, 1, 0, 0);
@@ -446,6 +618,7 @@ void SceneTaxi::RenderSkybox()
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
+	modelStack.Translate(skybox_translateX, skybox_translateY, skybox_translateZ);
 	modelStack.Scale(1000, 1000, 1000);
 	modelStack.Translate(0, 0.5f, 0);
 	modelStack.Rotate(-90, 1, 0, 0);
@@ -454,6 +627,7 @@ void SceneTaxi::RenderSkybox()
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
+	modelStack.Translate(skybox_translateX, skybox_translateY, skybox_translateZ);
 	modelStack.Scale(1000, 1000, 1000);
 	modelStack.Translate(0, -0.5f, 0);
 	modelStack.Rotate(90, 1, 0, 0);
@@ -462,6 +636,7 @@ void SceneTaxi::RenderSkybox()
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
+	modelStack.Translate(skybox_translateX, skybox_translateY, skybox_translateZ);
 	modelStack.Scale(1000, 1000, 1000);
 	modelStack.Translate(0, 0.f, -0.5);
 	modelStack.Rotate(0, 1, 0, 0);

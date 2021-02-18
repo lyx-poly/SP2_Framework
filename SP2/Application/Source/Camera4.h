@@ -1,9 +1,9 @@
-#ifndef CAMERA_3_H
-#define CAMERA_3_H
+#ifndef CAMERA_4_H
+#define CAMERA_4_H
 
 #include "Camera.h"
 
-class Camera3 : public Camera
+class Camera4 : public Camera
 {
 public:
 	//Vector3 position;
@@ -14,11 +14,11 @@ public:
 	Vector3 defaultTarget;
 	Vector3 defaultUp;
 
-	Camera3();
-	~Camera3();
+	Camera4();
+	~Camera4();
 	virtual void Init(const Vector3& pos, const Vector3& target, const Vector3& up);
 	virtual void Update(double dt);
-	virtual void Reset();
+	//virtual void Reset();
 	bool fps;
 };
 

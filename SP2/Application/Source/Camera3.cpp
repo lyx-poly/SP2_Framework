@@ -65,7 +65,8 @@ To be called every frame. Camera will get user inputs and update its position an
 void Camera3::Update(double dt)
 {
     static const float CAMERA_SPEED = 50.f;
-    static const float ZOOM_SPEED = 20.F;
+    static const float CAMERA_SPEED2 = 10.f;
+   // static const float ZOOM_SPEED = 20.F;
     Vector3 view = (target - position).Normalized();
     Vector3 moveDir = view;
     Vector3 rightDir = view.Cross(up).Normalized();
@@ -90,6 +91,7 @@ void Camera3::Update(double dt)
         position -= view * ZOOM_SPEED * static_cast<float>(dt);
         target = position + view;
     }*/
+    
     if (Application::IsKeyPressed('A'))
     {
         /*Vector3 right = view.Cross(up).Normalized();
@@ -97,8 +99,8 @@ void Camera3::Update(double dt)
 
         up = right.Cross(view).Normalized();*/
 
-        position -= rightDir * dt * 50;
-        target -= rightDir * dt * 50;
+        position -= rightDir * dt * CAMERA_SPEED2;
+        target -= rightDir * dt * CAMERA_SPEED2;
     }
     if (Application::IsKeyPressed('D'))
     {
@@ -107,8 +109,8 @@ void Camera3::Update(double dt)
 
          up = right.Cross(view).Normalized();*/
 
-        position += rightDir * dt * 50;
-        target += rightDir * dt * 50;
+        position += rightDir * dt * CAMERA_SPEED2;
+        target += rightDir * dt * CAMERA_SPEED2;
     }
     if (Application::IsKeyPressed('W'))
     {
@@ -117,8 +119,8 @@ void Camera3::Update(double dt)
         up = right.Cross(view).Normalized();*/
 
 
-        position += moveDir * dt * 50;
-        target += moveDir * dt * 50;
+        position += moveDir * dt * CAMERA_SPEED2;
+        target += moveDir * dt * CAMERA_SPEED2;
     }
     if (Application::IsKeyPressed('S'))
     {
@@ -127,9 +129,48 @@ void Camera3::Update(double dt)
 
         up = right.Cross(view).Normalized();*/
 
-        position -= moveDir * dt * 50;
-        target -= moveDir * dt * 50;
+        position -= moveDir * dt * CAMERA_SPEED2;
+        target -= moveDir * dt * CAMERA_SPEED2;
     }
+
+    /*else if (Application::IsKeyPressed('Q'))
+    {
+        moveDir.y += 2;
+        rightDir.y += 2;
+
+        position -= moveDir * dt;
+        target -= moveDir * dt;
+    }
+    else if (Application::IsKeyPressed('E'))
+    {
+        moveDir.y -= 2;
+        rightDir.y -= 2;
+
+        position -= moveDir * dt;
+        target -= moveDir * dt;
+    }*/
+
+    if (Application::IsKeyPressed('E')) // Up to y+
+    {
+        position.y += CAMERA_SPEED2 * dt;
+        target.y += CAMERA_SPEED2 * dt;
+    }
+
+    if (Application::IsKeyPressed('Q')) // Down to y-
+    {
+        if (position.y <= 1)
+        {
+            position.y += CAMERA_SPEED2 * dt;
+            target.y += CAMERA_SPEED2 * dt;
+        }
+
+        else
+        {
+            position.y -= CAMERA_SPEED2 * dt;
+            target.y -= CAMERA_SPEED2 * dt;
+        }
+    }
+
     if (Application::IsKeyPressed(VK_LEFT))
     {
         float yaw = CAMERA_SPEED * static_cast<float>(dt);

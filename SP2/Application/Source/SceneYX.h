@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include "Camera2.h"
 #include "Camera3.h"
+#include "Camera4.h"
 #include "Mesh.h"
 #include "MatrixStack.h"
 #include "Light.h"
@@ -28,6 +29,20 @@ class SceneTaxi : public Scene
 		GEO_FRONT,
 		GEO_BACK,
 		GEO_TORUS,
+
+		// Hover Taxi
+		GEO_TAXI,
+		GEO_HOVER,
+
+		// Road
+		GEO_ROAD,
+
+		// Residential Buildings
+		GEO_FLAT1,
+
+		// Hospital
+		GEO_HOSPITAL,
+		GEO_RED_CROSS,
 
 		GEO_TEXT,
 		GEO_TEXT1,
@@ -98,9 +113,12 @@ private:
 	Mtx44 projection;
 	Mtx44 MVP;
 
-	Light light[3];
+	Light light[1];
 
 	//float FPS;
+
+	// Skybox translate
+	float skybox_translateX, skybox_translateY, skybox_translateZ;
 
 	Camera3 camera;
 	Camera2 camera2;

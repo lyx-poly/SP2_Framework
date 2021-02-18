@@ -110,7 +110,7 @@ void Application::Init()
 void Application::Run()
 {
 	//Main Loop
-	Scene *scene = new SceneMH();
+	Scene *scene = new SceneTaxi();
 	//Scene* scene1 = new SceneUI();
 	//Scene* scene2 = new Assignment2();
 	//Scene* scene = scene1;

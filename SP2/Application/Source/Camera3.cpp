@@ -101,6 +101,12 @@ void Camera3::Update(double dt)
 
         position -= rightDir * dt * CAMERA_SPEED2;
         target -= rightDir * dt * CAMERA_SPEED2;
+
+        if (position.x > 50 || position.x < -250 || position.z > 250 || position.z < -250)
+        {
+            position += rightDir * dt * CAMERA_SPEED2;
+            target += rightDir * dt * CAMERA_SPEED2;
+        }
     }
     if (Application::IsKeyPressed('D'))
     {
@@ -111,6 +117,12 @@ void Camera3::Update(double dt)
 
         position += rightDir * dt * CAMERA_SPEED2;
         target += rightDir * dt * CAMERA_SPEED2;
+
+        if (position.x > 50 || position.x < -250 || position.z > 250 || position.z < -250)
+        {
+            position -= rightDir * dt * CAMERA_SPEED2;
+            target -= rightDir * dt * CAMERA_SPEED2;
+        }
     }
     if (Application::IsKeyPressed('W'))
     {
@@ -121,6 +133,12 @@ void Camera3::Update(double dt)
 
         position += moveDir * dt * CAMERA_SPEED2;
         target += moveDir * dt * CAMERA_SPEED2;
+
+        if (position.x > 50 || position.x < -250 || position.z > 250 || position.z < -250)
+        {
+            position -= moveDir * dt * CAMERA_SPEED2;
+            target -= moveDir * dt * CAMERA_SPEED2;
+        }
     }
     if (Application::IsKeyPressed('S'))
     {
@@ -131,6 +149,12 @@ void Camera3::Update(double dt)
 
         position -= moveDir * dt * CAMERA_SPEED2;
         target -= moveDir * dt * CAMERA_SPEED2;
+
+        if (position.x > 50 || position.x < -250 || position.z > 250 || position.z < -250)
+        {
+            position += moveDir * dt * CAMERA_SPEED2;
+            target += moveDir * dt * CAMERA_SPEED2;
+        }
     }
 
     /*else if (Application::IsKeyPressed('Q'))

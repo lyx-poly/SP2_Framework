@@ -13,6 +13,14 @@
 SceneTaxi::SceneTaxi()
 {
 	skybox_translateX = skybox_translateY = skybox_translateZ = 0.0f;
+	spire_passive_rotate = 0.0f;
+	// Spire locations
+
+	spire_x1 = -65; spire_y1 = 0; spire_z1 = -35;	// Resident District
+	spire_x2 = 30; spire_y2 = 10; spire_z2 = -10;	// Hospital
+	spire_x3 = 20; spire_y3 = 0; spire_z3 = 85;	// Taxi Company
+	spire_x4 = -194; spire_y4 = 66; spire_z4 = 54;	// Commerical District
+	spire_x5 = -170; spire_y5 = 0; spire_z5 = -100;	// Mall
 }
 
 SceneTaxi::~SceneTaxi()
@@ -35,7 +43,7 @@ void SceneTaxi::Init()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	camera.Init(Vector3(3, 1, 3), Vector3(0, 1, 0), Vector3(0, 1, 0));
+	camera.Init(Vector3(1, 150, 150), Vector3(0, 1, 0), Vector3(0, 1, 0));
 
 
 	// Animation Parameters
@@ -61,30 +69,124 @@ void SceneTaxi::Init()
 	meshList[GEO_QUAD]->material.kShininess = 0.2f;
 
 	meshList[GEO_LIGHTBALL] = MeshBuilder::GenerateSphere("sphere", Color(1,1,1), 18, 18, 1.0f);
+
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("Destination text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Image//calibri.tga");
 
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("reference", 1500, 1500, 1500);
+
+	meshList[GEO_NAV_SPIRE] = MeshBuilder::GenerateCube("reference", Color(0,1,0), 1);
+	meshList[GEO_NAV_TAXI] = MeshBuilder::GenerateCube("reference", Color(1, 1, 0), 1);
 
 	// Road
 	meshList[GEO_ROAD] = MeshBuilder::GenerateOBJMTL("Taxi", "OBJ//road_straight.obj", "OBJ//road_straight.mtl");
 
 	// Hover Taxi
 	meshList[GEO_TAXI] = MeshBuilder::GenerateOBJMTL("Taxi", "OBJ//taxi.obj", "OBJ//taxi.mtl");
+	//meshList[GEO_TAXI] = MeshBuilder::GenerateOBJ("Taxi", "OBJ//mall.obj");
 	meshList[GEO_HOVER] = MeshBuilder::GenerateCube("Hoverpad", Color(0.5, 0.5, 0.5), 1.0f);
 	meshList[GEO_HOVER]->material.kAmbient.Set(0.1f, 0.1f, 0.1f);
 	meshList[GEO_HOVER]->material.kDiffuse.Set(0.3f, 0.3f, 0.3f);
 	meshList[GEO_HOVER]->material.kSpecular.Set(0.2f, 0.2f, 0.2f);
 	meshList[GEO_HOVER]->material.kShininess = 0.5f;
 
-	// Residential Buildings
-	//meshList[GEO_FLAT1] = MeshBuilder::GenerateOBJMTL("Flat_1", "OBJ//1.obj", "OBJ//1.mtl");
-	meshList[GEO_FLAT1] = MeshBuilder::GenerateCube("Placeholder Flat", Color(0.75, 0.75, 0.75), 1.0f);
-	meshList[GEO_FLAT1]->material.kAmbient.Set(0.5f, 0.5f, 0.5f);
-	meshList[GEO_FLAT1]->material.kDiffuse.Set(1.0f, 1.0f, 1.0f);
-	meshList[GEO_FLAT1]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
-	meshList[GEO_FLAT1]->material.kShininess = 1.f;
+	// Taxi Company
+	meshList[GEO_TAXI_COMPANY] = MeshBuilder::GenerateOBJMTL("TAXI COMPANY", "OBJ//taxicompany.obj", "OBJ//taxicompany.mtl");
+	meshList[GEO_TAXI_PAD] = MeshBuilder::GenerateCube("Taxi Parking lot", Color(1, 1, 0), 1.0f);
+	meshList[GEO_TAXI_PAD]->material.kAmbient.Set(0.5f, 0.5f, 0.5f);
+	meshList[GEO_TAXI_PAD]->material.kDiffuse.Set(1, 1, 1);
+	meshList[GEO_TAXI_PAD]->material.kSpecular.Set(0.2f, 0.2f, 0.2f);
+	meshList[GEO_TAXI_PAD]->material.kShininess = 1.0f;
 
+	// Passenger Pads and Spires
+	meshList[GEO_PASSENGERS_PAD_1] = MeshBuilder::GenerateCube("GEO_PASSENGERS_PAD_1", Color(1, 0.75, 0.75), 1.0f);
+	meshList[GEO_PASSENGERS_SPIRE_1] = MeshBuilder::GenerateCube("GEO_PASSENGERS_SPIRE_1", Color(1, 0, 0), 1.0f);
+
+	meshList[GEO_PASSENGERS_PAD_2] = MeshBuilder::GenerateCube("GEO_PASSENGERS_PAD_2", Color(1, 0.75, 0.75), 1.0f);
+	meshList[GEO_PASSENGERS_SPIRE_2] = MeshBuilder::GenerateCube("GEO_PASSENGERS_SPIRE_2", Color(1, 0, 0), 1.0f);
+
+	meshList[GEO_PASSENGERS_PAD_3] = MeshBuilder::GenerateCube("GEO_PASSENGERS_PAD_3", Color(1, 0.75, 0.75), 1.0f);
+	meshList[GEO_PASSENGERS_SPIRE_3] = MeshBuilder::GenerateCube("GEO_PASSENGERS_SPIRE_3", Color(1, 0, 0), 1.0f);
+
+	meshList[GEO_PASSENGERS_PAD_4] = MeshBuilder::GenerateCube("GEO_PASSENGERS_PAD_4", Color(1, 0.75, 0.75), 1.0f);
+	meshList[GEO_PASSENGERS_SPIRE_4] = MeshBuilder::GenerateCube("GEO_PASSENGERS_SPIRE_4", Color(1, 0, 0), 1.0f);
+
+	meshList[GEO_PASSENGERS_PAD_5] = MeshBuilder::GenerateCube("GEO_PASSENGERS_PAD_5", Color(1, 0.75, 0.75), 1.0f);
+	meshList[GEO_PASSENGERS_SPIRE_5] = MeshBuilder::GenerateCube("GEO_PASSENGERS_SPIRE_5", Color(1, 0, 0), 1.0f);
+
+
+	// Passenger Models
+	meshList[GEO_PASSENGERS_MALE_1] = MeshBuilder::GenerateOBJMTL("Male Passenger", "OBJ//Male_Standing.obj", "OBJ//Male_Standing.mtl");
+	meshList[GEO_PASSENGERS_MALE_2] = MeshBuilder::GenerateOBJMTL("Male Passenger", "OBJ//Male_Standing_CoveringEyes.obj", "OBJ//Male_Standing_CoveringEyes.mtl");
+	meshList[GEO_PASSENGERS_MALE_3] = MeshBuilder::GenerateOBJMTL("Male Passenger", "OBJ//Male_Standing_Hips.obj", "OBJ//Male_Standing_Hips.mtl");
+	meshList[GEO_PASSENGERS_MALE_4] = MeshBuilder::GenerateOBJMTL("Male Passenger", "OBJ//Male_Standing_Waving.obj", "OBJ//Male_Standing_Waving.mtl");
+	meshList[GEO_PASSENGERS_MALE_5] = MeshBuilder::GenerateOBJMTL("Male Passenger", "OBJ//Male_Walking.obj", "OBJ//Male_Walking.mtl");
+
+	meshList[GEO_PASSENGERS_MALE_HAIR_1] = MeshBuilder::GenerateOBJMTL("Male Passenger Hair", "OBJ//Male_Hairstyle_1.obj", "OBJ//Male_Hairstyle_1.mtl");
+	meshList[GEO_PASSENGERS_MALE_HAIR_2] = MeshBuilder::GenerateOBJMTL("Male Passenger Hair", "OBJ//Male_Hairstyle_2.obj", "OBJ//Male_Hairstyle_2.mtl");
+	meshList[GEO_PASSENGERS_MALE_HAIR_3] = MeshBuilder::GenerateOBJMTL("Male Passenger Hair", "OBJ//Male_Hairstyle_3.obj", "OBJ//Male_Hairstyle_3.mtl");
+	meshList[GEO_PASSENGERS_MALE_HAIR_4] = MeshBuilder::GenerateOBJMTL("Male Passenger Hair", "OBJ//Male_Hairstyle_4.obj", "OBJ//Male_Hairstyle_4.mtl");
+
+	meshList[GEO_PASSENGERS_FEMALE_1] = MeshBuilder::GenerateOBJMTL("Female Passenger", "OBJ//Female_Standing.obj", "OBJ//Female_Standing.mtl");
+	meshList[GEO_PASSENGERS_FEMALE_2] = MeshBuilder::GenerateOBJMTL("Female Passenger", "OBJ//Female_Standing_CoveringEyes.obj", "OBJ//Female_Standing_CoveringEyes.mtl");
+	meshList[GEO_PASSENGERS_FEMALE_3] = MeshBuilder::GenerateOBJMTL("Female Passenger", "OBJ//Female_Standing_Hips.obj", "OBJ//Female_Standing_Hips.mtl");
+	meshList[GEO_PASSENGERS_FEMALE_4] = MeshBuilder::GenerateOBJMTL("Female Passenger", "OBJ//Woman_Standing_Waving.obj", "OBJ//Woman_Standing_Waving.mtl");
+	meshList[GEO_PASSENGERS_FEMALE_5] = MeshBuilder::GenerateOBJMTL("Female Passenger", "OBJ//Female_Walking.obj", "OBJ//Female_Walking.mtl");
+
+	meshList[GEO_PASSENGERS_FEMALE_HAIR_1] = MeshBuilder::GenerateOBJMTL("Female Passenger Hair", "OBJ//Female_Hairstyle_1.obj", "OBJ//Female_Hairstyle_1.mtl");
+	meshList[GEO_PASSENGERS_FEMALE_HAIR_2] = MeshBuilder::GenerateOBJMTL("Female Passenger Hair", "OBJ//Female_Hairstyle_2.obj", "OBJ//Female_Hairstyle_2.mtl");
+	meshList[GEO_PASSENGERS_FEMALE_HAIR_3] = MeshBuilder::GenerateOBJMTL("Female Passenger Hair", "OBJ//Female_Hairstyle_3.obj", "OBJ//Female_Hairstyle_3.mtl");
+	meshList[GEO_PASSENGERS_FEMALE_HAIR_4] = MeshBuilder::GenerateOBJMTL("Female Passenger Hair", "OBJ//Female_Hairstyle_4.obj", "OBJ//Female_Hairstyle_4.mtl");
+
+
+	// Residential Buildings
+	meshList[GEO_FLAT1] = MeshBuilder::GenerateOBJMTL("Flat_1", "OBJ//Residential Buildings 006.obj", "OBJ//Residential Buildings 006.mtl");
+
+	meshList[GEO_FLAT_PAD] = MeshBuilder::GenerateCube("Placeholder Flat", Color(0, 1, 0), 1.0f);
+	meshList[GEO_FLAT_PAD]->material.kAmbient.Set(0.5f, 0.5f, 0.5f);
+	meshList[GEO_FLAT_PAD]->material.kDiffuse.Set(1.0f, 1.0f, 1.0f);
+	meshList[GEO_FLAT_PAD]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_FLAT_PAD]->material.kShininess = 1.f;
+
+	// Mall
+
+	//meshList[GEO_MALL] = MeshBuilder::GenerateOBJMTL("MAll", "OBJ//plaza.obj", "OBJ//plaza.mtl");
+	meshList[GEO_MALL] = MeshBuilder::GenerateCube("Placeholder Mall", Color(0.9, 0.9, 0.9), 1.0f);
+	meshList[GEO_MALL]->material.kAmbient.Set(0.9f, 0.9f, 0.9f);
+	meshList[GEO_MALL]->material.kDiffuse.Set(1.0f, 1.0f, 1.0f);
+	meshList[GEO_MALL]->material.kSpecular.Set(0.8f, 0.8f, 0.8f);
+	meshList[GEO_MALL]->material.kShininess = 1.f;
+
+	meshList[GEO_MALL_SIGN] = MeshBuilder::GenerateCube("Placeholder Mall Sign", Color(0,0,0.5f), 1.0f);
+	meshList[GEO_MALL_SIGN]->material.kAmbient.Set(0.5f, 0.5f, 0.5f);
+	meshList[GEO_MALL_SIGN]->material.kDiffuse.Set(1.0f, 1.0f, 1.0f);
+	meshList[GEO_MALL_SIGN]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_MALL_SIGN]->material.kShininess = 1.f;
+
+	meshList[GEO_MALL_PAD] = MeshBuilder::GenerateCube("Placeholder Mall Pad", Color(0, 0, 0.25f), 1.0f);
+
+	// Park
+	meshList[GEO_TREE1] = MeshBuilder::GenerateOBJMTL("Tree 1", "OBJ//tree_pineTallA_detailed.obj", "OBJ//tree_pineTallA_detailed.mtl");
+	meshList[GEO_TREE2] = MeshBuilder::GenerateOBJMTL("Tree 2", "OBJ//tree_pineTallB_detailed.obj", "OBJ//tree_pineTallB_detailed.mtl");
+	meshList[GEO_TREE3] = MeshBuilder::GenerateOBJMTL("Tree 3", "OBJ//tree_pineTallC_detailed.obj", "OBJ//tree_pineTallC_detailed.mtl");
+	meshList[GEO_TREE4] = MeshBuilder::GenerateOBJMTL("Tree 4", "OBJ//tree_pineTallD_detailed.obj", "OBJ//tree_pineTallD_detailed.mtl");
+
+	meshList[GEO_PARK_PAD] = MeshBuilder::GenerateCube("Park Landing platform", Color(0, 0.25f, 0), 1.0f);
+
+	// Business scifi buildings
+	meshList[GEO_SCIFI_1] = MeshBuilder::GenerateOBJMTL("Scifi_1", "OBJ//building1.obj", "OBJ//building1.mtl");
+	meshList[GEO_SCIFI_PLATFORM] = MeshBuilder::GenerateCube("Hover Platform", Color(0, 0, 1), 1);
+	meshList[GEO_SCIFI_PLATFORM]->material.kAmbient.Set(0.5f, 0.5f, 0.5f);
+	meshList[GEO_SCIFI_PLATFORM]->material.kDiffuse.Set(1.0f, 1.0f, 1.0f);
+	meshList[GEO_SCIFI_PLATFORM]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_SCIFI_PLATFORM]->material.kShininess = 1.f;
+
+	meshList[GEO_SCIFI_2] = MeshBuilder::GenerateOBJMTL("Scifi_2", "OBJ//building2.obj", "OBJ//building2.mtl");
+	meshList[GEO_SCIFI_3] = MeshBuilder::GenerateOBJMTL("Scifi_3", "OBJ//building3.obj", "OBJ//building3.mtl");
+	meshList[GEO_SCIFI_4] = MeshBuilder::GenerateOBJMTL("Scifi_4", "OBJ//building4.obj", "OBJ//building4.mtl");
+	meshList[GEO_SCIFI_5] = MeshBuilder::GenerateOBJMTL("Scifi_5", "OBJ//building5.obj", "OBJ//building5.mtl");
+	meshList[GEO_SCIFI_6] = MeshBuilder::GenerateOBJMTL("Scifi_6", "OBJ//building6.obj", "OBJ//building6.mtl");
+	meshList[GEO_SCIFI_7] = MeshBuilder::GenerateOBJMTL("Scifi_7", "OBJ//building7.obj", "OBJ//building7.mtl");
 	// Hospital
 	meshList[GEO_HOSPITAL] = MeshBuilder::GenerateCube("Placeholder Hospital", Color(1, 1, 1), 1.0f);
 	meshList[GEO_HOSPITAL]->material.kAmbient.Set(0.5f, 0.5f, 0.5f);
@@ -97,6 +199,12 @@ void SceneTaxi::Init()
 	meshList[GEO_RED_CROSS]->material.kDiffuse.Set(1.0f, 1.0f, 1.0f);
 	meshList[GEO_RED_CROSS]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
 	meshList[GEO_RED_CROSS]->material.kShininess = 1.f;
+
+	meshList[GEO_HOSPITAL_PAD] = MeshBuilder::GenerateCube("Landing pad hospital", Color(1, 0, 0), 1.0f);
+	meshList[GEO_HOSPITAL_PAD]->material.kAmbient.Set(0.5f, 0.5f, 0.5f);
+	meshList[GEO_HOSPITAL_PAD]->material.kDiffuse.Set(1.0f, 1.0f, 1.0f);
+	meshList[GEO_HOSPITAL_PAD]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_HOSPITAL_PAD]->material.kShininess = 1.f;
 
 	// Skybox
 	meshList[GEO_FRONT] = MeshBuilder::GenerateQuad("front", Color(1, 1, 1), 1.f);
@@ -180,8 +288,8 @@ void SceneTaxi::Init()
 	glUseProgram(m_programID);
 
 	light[0].type = Light::LIGHT_POINT;
-	light[0].position.Set(0, 5, 0);
-	light[0].color.Set(0.4f, 0.4f, 1.f);
+	light[0].position.Set(0, 10, 0);
+	light[0].color.Set(1, 1, 1);
 	light[0].power = 0.4f;
 	light[0].kC = 1.f;
 	light[0].kL = 0.01f;
@@ -286,18 +394,18 @@ void SceneTaxi::Update(double dt)
 	}
 	if (Application::IsKeyPressed('V'))
 	{
-		light[0].power = 2;
+		light[0].power = 1;
 	}
 
 	glUniform1f(m_parameters[U_LIGHT0_POWER], light[0].power);
 	glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
-	glUniform1f(m_parameters[U_LIGHT1_POWER], light[1].power);
+	/*glUniform1f(m_parameters[U_LIGHT1_POWER], light[1].power);
 	glUniform1i(m_parameters[U_LIGHT1_TYPE], light[1].type);
 	glUniform1f(m_parameters[U_LIGHT2_POWER], light[2].power);
-	glUniform1i(m_parameters[U_LIGHT2_TYPE], light[2].type);
+	glUniform1i(m_parameters[U_LIGHT2_TYPE], light[2].type);*/
 
 	// Move lightball
-	static const float LSPEED = 4.f;
+	static const float LSPEED = 20.f;
 
 	if (Application::IsKeyPressed('I'))
 		light[0].position.z -= (float)(LSPEED * dt);
@@ -311,6 +419,7 @@ void SceneTaxi::Update(double dt)
 		light[0].position.y -= (float)(LSPEED * dt);
 	if (Application::IsKeyPressed('P'))
 		light[0].position.y += (float)(LSPEED * dt);
+	//std::cout << light[0].position.x << ", "<< light[0].position.y << ", " << light[0].position.z << std::endl;
 
 	/*// Skybox translate
 	if (Application::IsKeyPressed('W')) // z-
@@ -354,6 +463,9 @@ void SceneTaxi::Update(double dt)
 		//std::cout << "RBUTTON UP" << std::endl;
 	}
 	//camera.position.y = 10;
+
+	// Passive SatNav Spire rotation
+	spire_passive_rotate += (float)(10 * dt);
 }
 
 void SceneTaxi::Render()
@@ -444,16 +556,163 @@ void SceneTaxi::Render()
 	RenderMesh(meshList[GEO_LIGHTBALL], false);
 	modelStack.PopMatrix();
 
+	// Ground mesh
 	modelStack.PushMatrix();
+	modelStack.Translate(-100, 0, 0);
 	modelStack.Rotate(-90, 1, 0, 0);
-	modelStack.Scale(500,500,500);
+	modelStack.Scale(300,500,500);
 	RenderMesh(meshList[GEO_QUAD], true);
 	modelStack.PopMatrix();
 
+	// Park
+
 	modelStack.PushMatrix();
+	modelStack.Translate(-170, 0, -225);
+	//modelStack.Rotate(90, 0, 1, 0);
+	//modelStack.Scale(500, 1, 5);
+	//RenderMesh(meshList[GEO_TREE1], true);
+
+	for (int a = 0; a < 50; a++)
+	{
+		modelStack.PushMatrix();
+		modelStack.Translate(a * 2, 0, 20);
+		RenderMesh(meshList[GEO_TREE2], true);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(a * 2, 0, 10);
+		RenderMesh(meshList[GEO_TREE4], true);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(a * 2, 0, 0);
+		RenderMesh(meshList[GEO_TREE3], true);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(a * 2, 0, -10);
+		RenderMesh(meshList[GEO_TREE1], true);
+		modelStack.PopMatrix();
+	}
+
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-170, 0, -200);
+	//modelStack.Rotate(90, 0, 1, 0);
+	//modelStack.Scale(500, 1, 5);
+	//RenderMesh(meshList[GEO_TREE1], true);
+
+	for (int a = 0; a < 50; a++)
+	{
+		modelStack.PushMatrix();
+		modelStack.Translate(a * 2, 0, 20);
+		RenderMesh(meshList[GEO_TREE2], true);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(a * 2, 0, 10);
+		RenderMesh(meshList[GEO_TREE4], true);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(a * 2, 0, 0);
+		RenderMesh(meshList[GEO_TREE3], true);
+		modelStack.PopMatrix();
+
+		modelStack.PushMatrix();
+		modelStack.Translate(a * 2, 0, -10);
+		RenderMesh(meshList[GEO_TREE1], true);
+		modelStack.PopMatrix();
+	}
+
+	modelStack.PushMatrix();
+	modelStack.Translate(120, 0, 0);
+	modelStack.Scale(7, 0.5, 7);
+	RenderMesh(meshList[GEO_PARK_PAD], false);
+	modelStack.PopMatrix();
+	modelStack.PopMatrix();
+
+
+	// Roads
+	modelStack.PushMatrix();
+	modelStack.Translate(0, 0.1f, 0);
 	modelStack.Rotate(90, 0, 1, 0);
-	modelStack.Scale(500, 1, 1);
+	modelStack.Scale(500, 1, 5);
 	RenderMesh(meshList[GEO_ROAD], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-100, 0.1f, 0);
+	//modelStack.Rotate(90, 0, 1, 0);
+	modelStack.Scale(300, 1, 5);
+	RenderMesh(meshList[GEO_ROAD], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-100, 0.1f, 150);
+	modelStack.Rotate(45, 0, 1, 0);
+	modelStack.Scale(285, 1, 5);
+	RenderMesh(meshList[GEO_ROAD], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-95, 0.1f, 125);
+	modelStack.Rotate(-45, 0, 1, 0);
+	modelStack.Scale(270, 1, 5);
+	RenderMesh(meshList[GEO_ROAD], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-190, 0.1f, 0);
+	modelStack.Rotate(90, 0, 1, 0);
+	modelStack.Scale(500, 1, 5);
+	RenderMesh(meshList[GEO_ROAD], true);
+	modelStack.PopMatrix();
+
+	// Taxi company
+	modelStack.PushMatrix();
+	//modelStack.Scale(3, 6, 3);
+	//modelStack.Rotate(-90, 0, 1, 0);
+	modelStack.Translate(20, 0, 75);
+	RenderMesh(meshList[GEO_TAXI_COMPANY], true);
+
+	modelStack.PushMatrix();
+	modelStack.Translate(0, 0, 10);
+	modelStack.Scale(13, 0.5, 13);
+	RenderMesh(meshList[GEO_TAXI_PAD], false);
+	for (int a = 0; a < 10; a++)
+	{
+		modelStack.PushMatrix();
+		modelStack.Scale(0.0769230769230, 2, 0.0769230769230);
+		modelStack.Translate(5.5f, 0.25, 6 - (1 * a));
+		modelStack.Rotate(-90, 0, 1, 0);
+		RenderMesh(meshList[GEO_TAXI], true);
+		modelStack.PopMatrix();
+	}
+	modelStack.PopMatrix();
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(10, 0.1f, 85);
+	modelStack.Scale(20, 1, 5);
+	RenderMesh(meshList[GEO_ROAD], true);
+	modelStack.PopMatrix();
+
+	// Passengers //
+
+	modelStack.PushMatrix();
+	modelStack.Translate(0, 50, 0);
+	modelStack.Scale(10, 1, 10);
+	RenderMesh(meshList[GEO_PASSENGERS_PAD_1], false);
+
+	modelStack.PushMatrix();
+	//modelStack.Translate(10, 0.1f, 85);
+	modelStack.Scale(0.1, 1000, 0.1);
+	modelStack.Rotate(spire_passive_rotate, 0, 1, 0);
+	RenderMesh(meshList[GEO_PASSENGERS_SPIRE_1], false);
+
+	modelStack.PopMatrix();
 	modelStack.PopMatrix();
 
 	// taxi
@@ -470,12 +729,76 @@ void SceneTaxi::Render()
 	modelStack.PopMatrix();
 	modelStack.PopMatrix();
 
+	// SatNav Spires //
+
+	// Residential District Spire
+	modelStack.PushMatrix();
+	modelStack.Translate(spire_x1, spire_y1, spire_z1);
+	modelStack.Scale(1, 1000, 1);
+	modelStack.Rotate(spire_passive_rotate, 0, 1, 0);
+	RenderMesh(meshList[GEO_NAV_SPIRE], false);
+	modelStack.PopMatrix();
+
+	// Hospital Spire
+	modelStack.PushMatrix();
+	modelStack.Translate(spire_x2, spire_y2, spire_z2);
+	modelStack.Scale(1, 1000, 1);
+	modelStack.Rotate(spire_passive_rotate, 0, 1, 0);
+	RenderMesh(meshList[GEO_NAV_SPIRE], false);
+	modelStack.PopMatrix();
+
+	// Taxi Company Spire (Different GEO)
+	modelStack.PushMatrix();
+	modelStack.Translate(spire_x3, spire_y3, spire_z3);
+	modelStack.Scale(1, 1000, 1);
+	modelStack.Rotate(spire_passive_rotate, 0, 1, 0);
+	RenderMesh(meshList[GEO_NAV_TAXI], false);
+	modelStack.PopMatrix();
+
+	// Commercial District Spire
+	modelStack.PushMatrix();
+	modelStack.Translate(spire_x4, spire_y4, spire_z4);
+	modelStack.Scale(1, 1000, 1);
+	modelStack.Rotate(spire_passive_rotate, 0, 1, 0);
+	RenderMesh(meshList[GEO_NAV_SPIRE], false);
+	modelStack.PopMatrix();
+
+	// Mall District Spire
+	modelStack.PushMatrix();
+	modelStack.Translate(spire_x5, spire_y5, spire_z5);
+	modelStack.Scale(1, 1000, 1);
+	modelStack.Rotate(spire_passive_rotate, 0, 1, 0);
+	RenderMesh(meshList[GEO_NAV_SPIRE], false);
+	modelStack.PopMatrix();
+
+	// Mall
+	modelStack.PushMatrix();
+	modelStack.Translate(-220, 0, -100);
+	modelStack.Scale(50,10,100);
+	RenderMesh(meshList[GEO_MALL], true);
+
+	modelStack.PushMatrix();
+	modelStack.Scale(0.02, 0.1, 0.01);
+	modelStack.Translate(25, 8, 0);
+	modelStack.Scale(1,2,10);
+	RenderMesh(meshList[GEO_MALL_SIGN], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Scale(0.02, 0.1, 0.01);
+	modelStack.Translate(50, 0, 0);
+	modelStack.Scale(30, 0.5, 30);
+	RenderMesh(meshList[GEO_MALL_SIGN], false);
+
+	modelStack.PopMatrix();
+	modelStack.PopMatrix();
+
 	// Hospital
 
 	modelStack.PushMatrix();
 	modelStack.Scale(10,10,10);
 	modelStack.Rotate(-90, 0, 1, 0);
-	modelStack.Translate(-1, 0.5, -1);
+	modelStack.Translate(-1, 0.5, -3);
 	RenderMesh(meshList[GEO_HOSPITAL], true);
 
 	modelStack.PushMatrix();
@@ -492,44 +815,107 @@ void SceneTaxi::Render()
 	RenderMesh(meshList[GEO_RED_CROSS], true);
 
 	modelStack.PopMatrix();
+	modelStack.PushMatrix();
+	modelStack.Translate(0, 0.5, 0);
+	modelStack.Scale(0.5, 0.1, 0.5);
+	//modelStack.Rotate(45, 0, 0, 1);
+	RenderMesh(meshList[GEO_HOSPITAL_PAD], false);
+
+	modelStack.PopMatrix();
 	modelStack.PopMatrix();
 
+	// Business District
+
+	modelStack.PushMatrix();
+	modelStack.Rotate(-90, 0, 1, 0);
+	modelStack.Translate(-20, 0, 200);
+	RenderMesh(meshList[GEO_SCIFI_1], true);
+	modelStack.PushMatrix();
+	modelStack.Translate(74, 66, -6);
+	modelStack.Scale(8, 1, 8);
+	modelStack.Rotate(-7, 0, 1, 0);
+	RenderMesh(meshList[GEO_SCIFI_PLATFORM], false);
+	//modelStack.PushMatrix();
+	//modelStack.Scale(0.08, 1000, 0.08);
+	//RenderMesh(meshList[GEO_NAV_SPIRE], false);
+	//modelStack.PopMatrix();
+	modelStack.PopMatrix();
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-10, 0, 30);
+	RenderMesh(meshList[GEO_SCIFI_2], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-100, 0, 230);
+	RenderMesh(meshList[GEO_SCIFI_3], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-150, 0, 250);
+	RenderMesh(meshList[GEO_SCIFI_4], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	//modelStack.Translate(-75, 0, 30);
+	RenderMesh(meshList[GEO_SCIFI_5], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	//modelStack.Translate(-25, 0, 30);
+	RenderMesh(meshList[GEO_SCIFI_6], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-100, 0, 100);
+	RenderMesh(meshList[GEO_SCIFI_7], true);
+	modelStack.PopMatrix();
 
 	// Residential District
-	modelStack.PushMatrix();
-	modelStack.Translate(-20, 0, -5);
-	modelStack.Scale(5, 20, 5);
-	modelStack.Translate(0, 0.5, 0);
-	RenderMesh(meshList[GEO_FLAT1], true);
-	modelStack.PopMatrix();
+	for (int a = 0; a < 10; a++)
+	{
+		modelStack.PushMatrix();
+		modelStack.Translate(-11 * (a + 1), 0, -15);
+		RenderMesh(meshList[GEO_FLAT1], true);
+		modelStack.PopMatrix();
+	}
 
-	modelStack.PushMatrix();
-	modelStack.Translate(-40, 0, -11);
-	modelStack.Scale(5, 20, 5);
-	modelStack.Translate(0, 0.5, 0);
-	RenderMesh(meshList[GEO_FLAT1], true);
-	modelStack.PopMatrix();
+	for (int b = 0; b < 10; b++)
+	{
+		modelStack.PushMatrix();
+		modelStack.Translate(-11 * (b + 1), 0, -60);
+		modelStack.Rotate(180, 0, 1, 0);
+		RenderMesh(meshList[GEO_FLAT1], true);
+		//modelStack.PopMatrix();
 
-	modelStack.PushMatrix();
-	modelStack.Translate(-12, 0, -25);
-	modelStack.Scale(5, 20, 5);
-	modelStack.Translate(0, 0.5, 0);
-	RenderMesh(meshList[GEO_FLAT1], true);
-	modelStack.PopMatrix();
+		if (b == 5)
+		{
+			modelStack.PushMatrix();
+			modelStack.Translate(0,0,-25);
+			modelStack.Scale(7,1,7);
+			RenderMesh(meshList[GEO_FLAT_PAD], false);
+			modelStack.PopMatrix();
+		}
+		modelStack.PopMatrix();
+	}
 
-	modelStack.PushMatrix();
-	modelStack.Translate(-19, 0, -15);
-	modelStack.Scale(5, 20, 5);
-	modelStack.Translate(0, 0.5, 0);
-	RenderMesh(meshList[GEO_FLAT1], true);
-	modelStack.PopMatrix();
+	for (int c = 0; c < 10; c++)
+	{
+		modelStack.PushMatrix();
+		modelStack.Translate(-11 * (c + 1), 0, -105);
+		RenderMesh(meshList[GEO_FLAT1], true);
+		modelStack.PopMatrix();
+	}
 
-	modelStack.PushMatrix();
-	modelStack.Translate(-33, 0, -2);
-	modelStack.Scale(5, 20, 5);
-	modelStack.Translate(0, 0.5, 0);
-	RenderMesh(meshList[GEO_FLAT1], true);
-	modelStack.PopMatrix();
+	for (int d = 0; d < 10; d++)
+	{
+		modelStack.PushMatrix();
+		modelStack.Translate(-11 * (d + 1), 0, -150);
+		modelStack.Rotate(180, 0, 1, 0);
+		RenderMesh(meshList[GEO_FLAT1], true);
+		modelStack.PopMatrix();
+	}
 
 	// Onscreen texy
 	RenderTextOnScreen(meshList[GEO_TEXT], "Destination: ", Color(0, 1, 0), 3, 0, 0);

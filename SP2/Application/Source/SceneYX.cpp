@@ -702,7 +702,7 @@ void SceneTaxi::Render()
 	// Passengers //
 
 	modelStack.PushMatrix();
-	modelStack.Translate(0, 50, 0);
+	modelStack.Translate(30, 0, -20);
 	modelStack.Scale(10, 1, 10);
 	RenderMesh(meshList[GEO_PASSENGERS_PAD_1], false);
 

@@ -13,6 +13,7 @@
 #include "Scene.h"
 #include "Assignment2.h"
 #include "SceneYX.h"
+#include "SceneXJ.h"
 #include "SceneMH.h"
 
 GLFWwindow* m_window;
@@ -110,7 +111,7 @@ void Application::Init()
 void Application::Run()
 {
 	//Main Loop
-	Scene *scene = new SceneTaxi();
+	Scene *scene = new SceneYX();
 	//Scene* scene1 = new SceneUI();
 	//Scene* scene2 = new Assignment2();
 	//Scene* scene = scene1;

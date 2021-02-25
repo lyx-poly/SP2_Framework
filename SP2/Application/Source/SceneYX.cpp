@@ -10,24 +10,43 @@
 #include <string>
 
 
-SceneTaxi::SceneTaxi()
+SceneYX::SceneYX()
 {
 	skybox_translateX = skybox_translateY = skybox_translateZ = 0.0f;
 	spire_passive_rotate = 0.0f;
+	cam_control = false;
+	taxi_rise_transition = 0;
+	pause = false;
+	cam_control = gamestart = true;
+
+	cash = 0;
 	// Spire locations
 
+	// Destination spires
 	spire_x1 = -65; spire_y1 = 0; spire_z1 = -35;	// Resident District
 	spire_x2 = 30; spire_y2 = 10; spire_z2 = -10;	// Hospital
 	spire_x3 = 20; spire_y3 = 0; spire_z3 = 85;	// Taxi Company
 	spire_x4 = -194; spire_y4 = 66; spire_z4 = 54;	// Commerical District
 	spire_x5 = -170; spire_y5 = 0; spire_z5 = -100;	// Mall
+
+	// Passenger spires
+	hospital_spire_x1 = 30; hospital_spire_y1 = 0;  hospital_spire_z1 = -20; // Hospital
+	commercial_spire_x2 = -100; commercial_spire_y2 = 0; commercial_spire_z2 = 100; // Commercial
+	residential1_spire_x3 = -50; residential1_spire_y3 = 0; residential1_spire_z3 = -35; // Residential 1
+	residential2_spire_x4 = -130; residential2_spire_y4 = 0; residential2_spire_z4 = -150; // Residential 2
+	mall_spire_x5 = -180; mall_spire_y5 = 0; mall_spire_z5 = -75; // Mall
+
+	value_store = speed_boost = lift_boost = side_hover = false;
+	dialogue_1 = dialogue_2 = dialogue_3 = dialogue_4 = dialogue_5 = false;
+	end_dialogue_1 = end_dialogue_2 = end_dialogue_3 = end_dialogue_4 = end_dialogue_5 = false;
+	passenger_deliver_1 = passenger_deliver_2 = passenger_deliver_3 = passenger_deliver_4 = passenger_deliver_5 = end_game = true;
 }
 
-SceneTaxi::~SceneTaxi()
+SceneYX::~SceneYX()
 {
 }
 
-void SceneTaxi::Init()
+void SceneYX::Init()
 {
 	// Init VBO here
 	// Set background color to dark blue
@@ -43,8 +62,7 @@ void SceneTaxi::Init()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	camera.Init(Vector3(1, 150, 150), Vector3(0, 1, 0), Vector3(0, 1, 0));
-
+	camera.Init(Vector3(5, 1, 87.5), Vector3(7.5, 1, 85), Vector3(0, 1, 0));
 
 	// Animation Parameters
 	
@@ -59,9 +77,13 @@ void SceneTaxi::Init()
 
 	//Mesh::SetMaterialLoc(m_parameters[U_MATERIAL_AMBIENT], m_parameters[U_MATERIAL_DIFFUSE], m_parameters[U_MATERIAL_SPECULAR], m_parameters[U_MATERIAL_SHININESS]);
 	meshList[GEO_FLOOR] = MeshBuilder::GenerateQuad("Floor", Color(1, 1, 1), 1.f);
-	meshList[GEO_FLOOR]->textureID = LoadTGA("Image//bottom1.tga");
+	meshList[GEO_FLOOR]->textureID = LoadTGA("Image//floor.tga");
+	meshList[GEO_FLOOR]->material.kAmbient.Set(0.5f, 0.5f, 0.5f);
+	meshList[GEO_FLOOR]->material.kDiffuse.Set(1.0f, 1.0f, 1.0f);
+	meshList[GEO_FLOOR]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
+	meshList[GEO_FLOOR]->material.kShininess = 0.2f;
 	
-	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("textBox", Color(0, 1, 0), 1.f);
+	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("Purple Button", Color(1, 0, 1), 1.f);
 	//meshList[GEO_QUAD]->textureID = LoadTGA("Image//textBox.tga");
 	meshList[GEO_QUAD]->material.kAmbient.Set(0.5f, 0.5f, 0.5f);
 	meshList[GEO_QUAD]->material.kDiffuse.Set(1.0f, 1.0f, 1.0f);
@@ -72,6 +94,10 @@ void SceneTaxi::Init()
 
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("Destination text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Image//calibri.tga");
+	meshList[GEO_TEXT1] = MeshBuilder::GenerateText("TITLE", 16, 16);
+	meshList[GEO_TEXT1]->textureID = LoadTGA("Image//calibri.tga");
+	meshList[GEO_TEXT2] = MeshBuilder::GenerateText("START", 16, 16);
+	meshList[GEO_TEXT2]->textureID = LoadTGA("Image//calibri.tga");
 
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("reference", 1500, 1500, 1500);
 
@@ -92,11 +118,15 @@ void SceneTaxi::Init()
 
 	// Taxi Company
 	meshList[GEO_TAXI_COMPANY] = MeshBuilder::GenerateOBJMTL("TAXI COMPANY", "OBJ//taxicompany.obj", "OBJ//taxicompany.mtl");
-	meshList[GEO_TAXI_PAD] = MeshBuilder::GenerateCube("Taxi Parking lot", Color(1, 1, 0), 1.0f);
+	meshList[GEO_TAXI_PAD] = MeshBuilder::GenerateCube("Taxi Parking lot", Color(1, 1, 0.75), 1.0f);
 	meshList[GEO_TAXI_PAD]->material.kAmbient.Set(0.5f, 0.5f, 0.5f);
 	meshList[GEO_TAXI_PAD]->material.kDiffuse.Set(1, 1, 1);
 	meshList[GEO_TAXI_PAD]->material.kSpecular.Set(0.2f, 0.2f, 0.2f);
 	meshList[GEO_TAXI_PAD]->material.kShininess = 1.0f;
+
+	// Taxi helper bot
+	meshList[GEO_ROBOT] = MeshBuilder::GenerateOBJMTL("Helper Bot", "OBJ//CyborgTaxi.obj", "OBJ//CyborgTaxi.mtl");
+	meshList[GEO_ROBOT]->textureID = LoadTGA("Image//CyborgTaxi.tga");
 
 	// Passenger Pads and Spires
 	meshList[GEO_PASSENGERS_PAD_1] = MeshBuilder::GenerateCube("GEO_PASSENGERS_PAD_1", Color(1, 0.75, 0.75), 1.0f);
@@ -142,7 +172,7 @@ void SceneTaxi::Init()
 	// Residential Buildings
 	meshList[GEO_FLAT1] = MeshBuilder::GenerateOBJMTL("Flat_1", "OBJ//Residential Buildings 006.obj", "OBJ//Residential Buildings 006.mtl");
 
-	meshList[GEO_FLAT_PAD] = MeshBuilder::GenerateCube("Placeholder Flat", Color(0, 1, 0), 1.0f);
+	meshList[GEO_FLAT_PAD] = MeshBuilder::GenerateCube("Flat pad", Color(0.75, 1, 0.75), 1.0f);
 	meshList[GEO_FLAT_PAD]->material.kAmbient.Set(0.5f, 0.5f, 0.5f);
 	meshList[GEO_FLAT_PAD]->material.kDiffuse.Set(1.0f, 1.0f, 1.0f);
 	meshList[GEO_FLAT_PAD]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
@@ -157,13 +187,13 @@ void SceneTaxi::Init()
 	meshList[GEO_MALL]->material.kSpecular.Set(0.8f, 0.8f, 0.8f);
 	meshList[GEO_MALL]->material.kShininess = 1.f;
 
-	meshList[GEO_MALL_SIGN] = MeshBuilder::GenerateCube("Placeholder Mall Sign", Color(0,0,0.5f), 1.0f);
+	meshList[GEO_MALL_SIGN] = MeshBuilder::GenerateCube("Placeholder Mall Sign", Color(0,1,0), 1.0f);
 	meshList[GEO_MALL_SIGN]->material.kAmbient.Set(0.5f, 0.5f, 0.5f);
 	meshList[GEO_MALL_SIGN]->material.kDiffuse.Set(1.0f, 1.0f, 1.0f);
 	meshList[GEO_MALL_SIGN]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
 	meshList[GEO_MALL_SIGN]->material.kShininess = 1.f;
 
-	meshList[GEO_MALL_PAD] = MeshBuilder::GenerateCube("Placeholder Mall Pad", Color(0, 0, 0.25f), 1.0f);
+	meshList[GEO_MALL_PAD] = MeshBuilder::GenerateCube("Placeholder Mall Pad", Color(0.75, 1, 0.75), 1.0f);
 
 	// Park
 	meshList[GEO_TREE1] = MeshBuilder::GenerateOBJMTL("Tree 1", "OBJ//tree_pineTallA_detailed.obj", "OBJ//tree_pineTallA_detailed.mtl");
@@ -175,7 +205,7 @@ void SceneTaxi::Init()
 
 	// Business scifi buildings
 	meshList[GEO_SCIFI_1] = MeshBuilder::GenerateOBJMTL("Scifi_1", "OBJ//building1.obj", "OBJ//building1.mtl");
-	meshList[GEO_SCIFI_PLATFORM] = MeshBuilder::GenerateCube("Hover Platform", Color(0, 0, 1), 1);
+	meshList[GEO_SCIFI_PLATFORM] = MeshBuilder::GenerateCube("Hover Platform", Color(0.75, 1, 0.75), 1);
 	meshList[GEO_SCIFI_PLATFORM]->material.kAmbient.Set(0.5f, 0.5f, 0.5f);
 	meshList[GEO_SCIFI_PLATFORM]->material.kDiffuse.Set(1.0f, 1.0f, 1.0f);
 	meshList[GEO_SCIFI_PLATFORM]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
@@ -200,7 +230,7 @@ void SceneTaxi::Init()
 	meshList[GEO_RED_CROSS]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
 	meshList[GEO_RED_CROSS]->material.kShininess = 1.f;
 
-	meshList[GEO_HOSPITAL_PAD] = MeshBuilder::GenerateCube("Landing pad hospital", Color(1, 0, 0), 1.0f);
+	meshList[GEO_HOSPITAL_PAD] = MeshBuilder::GenerateCube("Landing pad hospital", Color(0.75, 1, 0.75), 1.0f);
 	meshList[GEO_HOSPITAL_PAD]->material.kAmbient.Set(0.5f, 0.5f, 0.5f);
 	meshList[GEO_HOSPITAL_PAD]->material.kDiffuse.Set(1.0f, 1.0f, 1.0f);
 	meshList[GEO_HOSPITAL_PAD]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
@@ -208,22 +238,22 @@ void SceneTaxi::Init()
 
 	// Skybox
 	meshList[GEO_FRONT] = MeshBuilder::GenerateQuad("front", Color(1, 1, 1), 1.f);
-	meshList[GEO_FRONT]->textureID = LoadTGA("Image//clouds1_posz.tga");
+	meshList[GEO_FRONT]->textureID = LoadTGA("Image//front.tga");
 
 	meshList[GEO_BACK] = MeshBuilder::GenerateQuad("back", Color(1, 1, 1), 1.f);
-	meshList[GEO_BACK]->textureID = LoadTGA("Image//clouds1_negz.tga");
+	meshList[GEO_BACK]->textureID = LoadTGA("Image//back.tga");
 
 	meshList[GEO_TOP] = MeshBuilder::GenerateQuad("top", Color(1, 1, 1), 1.f);
-	meshList[GEO_TOP]->textureID = LoadTGA("Image//clouds1_posy.tga");
+	meshList[GEO_TOP]->textureID = LoadTGA("Image//top.tga");
 
 	meshList[GEO_BOTTOM] = MeshBuilder::GenerateQuad("bottom", Color(1, 1, 1), 1.f);
-	meshList[GEO_BOTTOM]->textureID = LoadTGA("Image//clouds1_negy.tga");
+	meshList[GEO_BOTTOM]->textureID = LoadTGA("Image//bottom.tga");
 
 	meshList[GEO_LEFT] = MeshBuilder::GenerateQuad("left", Color(1, 1, 1), 1.f);
-	meshList[GEO_LEFT]->textureID = LoadTGA("Image//clouds1_posx.tga");
+	meshList[GEO_LEFT]->textureID = LoadTGA("Image//left.tga");
 
 	meshList[GEO_RIGHT] = MeshBuilder::GenerateQuad("right", Color(1, 1, 1), 1.f);
-	meshList[GEO_RIGHT]->textureID = LoadTGA("Image//clouds1_negx.tga");
+	meshList[GEO_RIGHT]->textureID = LoadTGA("Image//right.tga");
 
 	//Load vertex and fragment shaders
 
@@ -287,10 +317,10 @@ void SceneTaxi::Init()
 
 	glUseProgram(m_programID);
 
-	light[0].type = Light::LIGHT_POINT;
-	light[0].position.Set(0, 10, 0);
+	light[0].type = Light::LIGHT_DIRECTIONAL;
+	light[0].position.Set(-250, 250, 0);
 	light[0].color.Set(1, 1, 1);
-	light[0].power = 0.4f;
+	light[0].power = 0.5f;
 	light[0].kC = 1.f;
 	light[0].kL = 0.01f;
 	light[0].kQ = 0.001f;
@@ -362,15 +392,19 @@ void SceneTaxi::Init()
 	glUniform1i(m_parameters[U_NUMLIGHTS], 3);
 }
 
-void SceneTaxi::Reset()
+void SceneYX::Reset()
 {
 
 }
 
-void SceneTaxi::Update(double dt)
+void SceneYX::Update(double dt)
 {
-	camera.Update(dt);
+	if (cam_control)
+	{
+		camera.Update(dt, speed_boost, lift_boost, side_hover);
+	}
 
+	// Culling debug
 	if (Application::IsKeyPressed(0x31))
 	{
 		glEnable(GL_CULL_FACE);
@@ -388,9 +422,10 @@ void SceneTaxi::Update(double dt)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //wireframe mode
 	}
 
+	// Light toggle
 	if (Application::IsKeyPressed('B'))
 	{
-		light[0].power = 0;
+		light[0].power = 0.5;
 	}
 	if (Application::IsKeyPressed('V'))
 	{
@@ -407,6 +442,7 @@ void SceneTaxi::Update(double dt)
 	// Move lightball
 	static const float LSPEED = 20.f;
 
+	/*
 	if (Application::IsKeyPressed('I'))
 		light[0].position.z -= (float)(LSPEED * dt);
 	if (Application::IsKeyPressed('K'))
@@ -419,6 +455,7 @@ void SceneTaxi::Update(double dt)
 		light[0].position.y -= (float)(LSPEED * dt);
 	if (Application::IsKeyPressed('P'))
 		light[0].position.y += (float)(LSPEED * dt);
+		*/
 	//std::cout << light[0].position.x << ", "<< light[0].position.y << ", " << light[0].position.z << std::endl;
 
 	/*// Skybox translate
@@ -441,34 +478,485 @@ void SceneTaxi::Update(double dt)
 		if (skybox_translateY >= 250) { skybox_translateY -= (float)(5 * dt); }
 		else { skybox_translateY += (float)(25 * dt); }*/
 
+	static bool spacestate = false;
+	if (Application::IsKeyPressed(VK_SPACE))
+	{
+		spacestate = true;
+	}
+
+	else
+	{
+		spacestate = false;
+	}
+	// Start Menu
 	static bool bLButtonState = false;
-	if (!bLButtonState && Application::IsMousePressed(0))
+	if (!bLButtonState && Application::IsMousePressed(0) && !gamestart)
 	{
 		bLButtonState = true;
+		std::cout << "LBUTTON DOWN" << std::endl;
+
+		//Converting Viewport space to UI space
+		double x, y;
+		Application::GetCursorPos(&x, &y);
+		unsigned w = Application::GetWindowWidth();
+		unsigned UI_WIDTH = w / 10;
+		unsigned h = Application::GetWindowHeight();
+		unsigned UI_HEIGHT = h / 10;
+		float posX = x / w * UI_WIDTH; //convert (0,800) to (0,80)
+		float posY = (1.f - y / h) * UI_HEIGHT; //convert (600,0) to (0,60)
+		std::cout << "posX:" << posX << " , posY:" << posY << std::endl;
+		if (posX > 32.5 && posX < 46 && posY > 5 && posY < 8 && !cam_control && !gamestart)
+		{
+			std::cout << "Hit!" << std::endl;
+			//trigger user action or function
+			cam_control = true;
+			gamestart = true;
+
+			camera.position.x = 5;
+			camera.position.y = 1;
+			camera.position.z = 85;
+
+			camera.target.x = 4;
+			camera.target.y = 1;
+			camera.target.z = 85;
+		}
+		else
+		{
+			std::cout << "Miss!" << std::endl;
+		}
 	}
-	else if (bLButtonState && !Application::IsMousePressed(0))
+	else if (bLButtonState && !Application::IsMousePressed(0) && !gamestart)
 	{
 		bLButtonState = false;
-		//std::cout << "LBUTTON UP" << std::endl;
-	}
-	static bool bRButtonState = false;
-	if (!bRButtonState && Application::IsMousePressed(1))
-	{
-		bRButtonState = true;
-		//std::cout << "RBUTTON DOWN" << std::endl;
-	}
-	else if (bRButtonState && !Application::IsMousePressed(1))
-	{
-		bRButtonState = false;
-		//std::cout << "RBUTTON UP" << std::endl;
+		std::cout << "LBUTTON UP" << std::endl;
 	}
 	//camera.position.y = 10;
 
 	// Passive SatNav Spire rotation
-	spire_passive_rotate += (float)(10 * dt);
+	if (!pause)
+	{
+		spire_passive_rotate += (float)(10 * dt);
+	}
+
+	// Pause Menu
+	if (Application::IsKeyPressed('P') && gamestart && !pause && !upgrade)
+	{
+		pause = true;
+		cam_control = false;
+	}
+
+		if (!bLButtonState && Application::IsMousePressed(0) && pause && !upgrade)
+		{
+			bLButtonState = true;
+			std::cout << "LBUTTON DOWN" << std::endl;
+
+			//Converting Viewport space to UI space
+			double x, y;
+			Application::GetCursorPos(&x, &y);
+			unsigned w = Application::GetWindowWidth();
+			unsigned UI_WIDTH = w / 10;
+			unsigned h = Application::GetWindowHeight();
+			unsigned UI_HEIGHT = h / 10;
+			float posX = x / w * UI_WIDTH; //convert (0,800) to (0,80)
+			float posY = (1.f - y / h) * UI_HEIGHT; //convert (600,0) to (0,60)
+			std::cout << "posX:" << posX << " , posY:" << posY << std::endl;
+			if (posX > 0 && posX < 18.5 && posY > 4.5f && posY < 7.5f && !cam_control)
+			{
+				std::cout << "Hit!" << std::endl;
+				//trigger user action or function
+				pause = false;
+				cam_control = true;
+			}
+			else
+			{
+				std::cout << "Miss!" << std::endl;
+			}
+		}
+		else if (bLButtonState && !Application::IsMousePressed(0) && pause)
+		{
+			bLButtonState = false;
+			std::cout << "LBUTTON UP" << std::endl;
+		}
+
+
+	// Upgrade menu
+		if (camera.position.x >= spire_x3 - 5 && camera.position.x <= spire_x3 + 5 &&
+			camera.position.y >= spire_y3 && camera.position.y <= spire_y3 + 2 &&
+			camera.position.z >= spire_z3 - 5 && camera.position.z <= spire_z3 + 5 &&
+			Application::IsKeyPressed('U') && gamestart && !upgrade && !pause)
+		{
+			upgrade = true;
+			cam_control = false;
+			
+			// Store original cam position
+			if (!value_store)
+			{
+				tempxyz_position[0] = camera.position.x;
+				tempxyz_position[1] = camera.position.y;
+				tempxyz_position[2] = camera.position.z;
+
+				tempxyz_target[0] = camera.target.x;
+				tempxyz_target[1] = camera.target.y;
+				tempxyz_target[2] = camera.target.z;
+
+				tempxyz_up[0] = camera.up.x;
+				tempxyz_up[1] = camera.up.y;
+				tempxyz_up[2] = camera.up.z;
+				value_store = true;
+			}
+
+			// Look at taxi
+			camera.position.x = 16;
+			camera.position.y = 1;
+			camera.position.z = 89;
+
+			camera.target.x = 17;
+			camera.target.y = 1;
+			camera.target.z = 88;
+
+			camera.up.x = 0;
+			camera.up.y = 1;
+			camera.up.z = 0;
+
+		}
+
+		if (!bLButtonState && Application::IsMousePressed(0) && upgrade && !pause)
+		{
+			bLButtonState = true;
+			std::cout << "LBUTTON DOWN" << std::endl;
+
+			//Converting Viewport space to UI space
+			double x, y;
+			Application::GetCursorPos(&x, &y);
+			unsigned w = Application::GetWindowWidth();
+			unsigned UI_WIDTH = w / 10;
+			unsigned h = Application::GetWindowHeight();
+			unsigned UI_HEIGHT = h / 10;
+			float posX = x / w * UI_WIDTH; //convert (0,800) to (0,80)
+			float posY = (1.f - y / h) * UI_HEIGHT; //convert (600,0) to (0,60)
+			std::cout << "posX:" << posX << " , posY:" << posY << std::endl;
+			if (posX > 1.5 && posX < 4.5 && posY > 9.5 && posY < 12.5 && !cam_control && cash >= 10)
+			{
+				// Get Side Thrusters
+				std::cout << "Hit!" << std::endl;
+				//trigger user action or function
+				side_hover = true;
+				cash -= 10;
+			}
+
+			if (posX > 1.5 && posX < 4.5 && posY > 12.5 && posY < 15.5 && !cam_control && cash >= 10)
+			{
+				// Upgrade Hover
+				std::cout << "Hit!" << std::endl;
+				//trigger user action or function
+				lift_boost = true;
+				cash -= 10;
+			}
+
+			if (posX > 1.5 && posX < 4.5 && posY > 15.5 && posY < 18.5 && !cam_control && cash >= 20)
+			{
+				// Upgrade Speed
+				std::cout << "Hit!" << std::endl;
+				//trigger user action or function
+				speed_boost = true;
+				cash -= 20;
+			}
+
+
+			if (posX > 0 && posX < 18.5 && posY > 4.5f && posY < 7.5f && !cam_control)
+			{
+				// Exit Upgrade
+				std::cout << "Hit!" << std::endl;
+				//trigger user action or function
+				upgrade = false;
+				cam_control = true;
+
+				camera.position.x = tempxyz_position[0]; // Revert to original position
+				camera.position.y = tempxyz_position[1];
+				camera.position.z = tempxyz_position[2];
+
+				camera.target.x = tempxyz_target[0];
+				camera.target.y = tempxyz_target[1];
+				camera.target.z = tempxyz_target[2];
+
+				camera.up.x = tempxyz_up[0];
+				camera.up.y = tempxyz_up[1];
+				camera.up.z = tempxyz_up[2];
+			}
+			else
+			{
+				std::cout << "Miss!" << std::endl;
+			}
+		}
+		else if (bLButtonState && !Application::IsMousePressed(0) && upgrade)
+		{
+			bLButtonState = false;
+			std::cout << "LBUTTON UP" << std::endl;
+		}
+
+
+	// Passenger Pick up & Drop off
+
+
+	if (camera.position.x >= hospital_spire_x1 - 5 && camera.position.x <= hospital_spire_x1 + 5 &&
+		camera.position.y >= hospital_spire_y1 && camera.position.y <= hospital_spire_y1 + 2 &&
+		camera.position.z >= hospital_spire_z1 - 5 && camera.position.z <= hospital_spire_z1 + 5
+		&& !passenger_deliver_1 && passengerID == 0) // Pick up at hospital
+	{
+		dialogue_1 = true;
+		if (spacestate)
+		{
+			passengerID = 1;
+			destination_1 = true;
+			std::cout << passengerID << std::endl;
+		}
+	}
+	else
+	{
+		dialogue_1 = false;
+	}
+
+	if (camera.position.x >= spire_x5 - 5 && camera.position.x <= spire_x5 + 5 &&
+		camera.position.y >= spire_y5 && camera.position.y <= spire_y5 + 2 &&
+		camera.position.z >= spire_z5 - 5 && camera.position.z <= spire_z5 + 5
+		&& !passenger_deliver_1 && passengerID == 1) // Drop off at Mall
+	{
+		end_dialogue_1 = true;
+		if (spacestate)
+		{
+			passengerID = 0;
+			destination_1 = false;
+			passenger_deliver_1 = true;
+
+			cash += 10;
+			std::cout << passengerID << std::endl;
+		}
+	}
+	else
+	{
+		end_dialogue_1 = false;
+	}
+
+
+	if (camera.position.x >= commercial_spire_x2 - 5 && camera.position.x <= commercial_spire_x2 + 5 &&
+		camera.position.y >= commercial_spire_y2 && camera.position.y <= commercial_spire_y2 + 2 &&
+		camera.position.z >= commercial_spire_z2 - 5 && camera.position.z <= commercial_spire_z2 + 5
+		&& !passenger_deliver_2 && passengerID == 0) // Pick up at commercial
+	{
+		dialogue_2 = true;
+		if (spacestate)
+		{
+			passengerID = 2;
+			destination_2 = true;
+			std::cout << passengerID << std::endl;
+		}
+	}
+	else
+	{
+		dialogue_2 = false;
+	}
+
+	if (camera.position.x >= spire_x1 - 5 && camera.position.x <= spire_x1 + 5 &&
+		camera.position.y >= spire_y1 && camera.position.y <= spire_y1 + 2 &&
+		camera.position.z >= spire_z1 - 5 && camera.position.z <= spire_z1 + 5
+		&& !passenger_deliver_2 && passengerID == 2) // Drop off at Resident
+	{
+		end_dialogue_2 = true;
+		if (spacestate)
+		{
+			passengerID = 0;
+			destination_2= false;
+			passenger_deliver_2 = true;
+
+			cash += 10;
+			std::cout << passengerID << std::endl;
+		}
+	}
+	else
+	{
+		end_dialogue_2 = false;
+	}
+
+
+	if (camera.position.x >= residential1_spire_x3 - 5 && camera.position.x <= residential1_spire_x3 + 5 &&
+		camera.position.y >= residential1_spire_y3 && camera.position.y <= residential1_spire_y3 + 2 &&
+		camera.position.z >= residential1_spire_z3 - 5 && camera.position.z <= residential1_spire_z3 + 5
+		&& !passenger_deliver_3 && passengerID == 0) // Pick up at Resident 1
+	{
+		dialogue_3 = true;
+		if (spacestate)
+		{
+			passengerID = 3;
+			destination_3 = true;
+			std::cout << passengerID << std::endl;
+		}
+	}
+	else
+	{
+		dialogue_3 = false;
+	}
+
+	if (camera.position.x >= spire_x4 - 5 && camera.position.x <= spire_x4 + 5 &&
+		camera.position.y >= spire_y4 && camera.position.y <= spire_y4 + 2 &&
+		camera.position.z >= spire_z4 - 5 && camera.position.z <= spire_z4 + 5
+		&& !passenger_deliver_3 && passengerID == 3) // Drop off at Commercial
+	{
+		end_dialogue_3 = true;
+		if (spacestate)
+		{
+			passengerID = 0;
+			destination_3 = false;
+			passenger_deliver_3 = true;
+
+			cash += 10;
+			std::cout << passengerID << std::endl;
+		}
+	}
+	else
+	{
+		end_dialogue_3 = false;
+	}
+
+
+	if (camera.position.x >= residential2_spire_x4 - 5 && camera.position.x <= residential2_spire_x4 + 5 &&
+		camera.position.y >= residential2_spire_y4 && camera.position.y <= residential2_spire_y4 + 2 &&
+		camera.position.z >= residential2_spire_z4 - 5 && camera.position.z <= residential2_spire_z4 + 5
+		&& !passenger_deliver_4 && passengerID == 0) // Pick up at Resident 2
+	{
+		dialogue_4 = true;
+		if (spacestate)
+		{
+			passengerID = 4;
+			destination_4 = true;
+			std::cout << passengerID << std::endl;
+		}
+	}
+	else
+	{
+		dialogue_4 = false;
+	}
+
+	if (camera.position.x >= spire_x2 - 5 && camera.position.x <= spire_x2 + 5 &&
+		camera.position.y >= spire_y2 && camera.position.y <= spire_y2 + 2 &&
+		camera.position.z >= spire_z2 - 5 && camera.position.z <= spire_z2 + 5
+		&& !passenger_deliver_4 && passengerID == 4) // Drop off at hospital
+	{
+		end_dialogue_4 = true;
+		if (spacestate)
+		{
+			passengerID = 0;
+			destination_4 = false;
+			passenger_deliver_4 = true;
+
+			cash += 10;
+			std::cout << passengerID << std::endl;
+		}
+	}
+	else
+	{
+		end_dialogue_4 = false;
+	}
+
+
+	if (camera.position.x >= mall_spire_x5 - 5 && camera.position.x <= mall_spire_x5 + 5 &&
+		camera.position.y >= mall_spire_y5 && camera.position.y <= mall_spire_y5 + 2 &&
+		camera.position.z >= mall_spire_z5 - 5 && camera.position.z <= mall_spire_z5 + 5
+		&& !passenger_deliver_5 && passengerID == 0) // Pick up at Mall
+	{
+		dialogue_5 = true;
+		if (spacestate)
+		{
+			passengerID = 5;
+			destination_5 = true;
+			std::cout << passengerID << std::endl;
+		}
+	}
+	else
+	{
+		dialogue_5 = false;
+	}
+
+	if (camera.position.x >= spire_x1 - 5 && camera.position.x <= spire_x1 + 5 &&
+		camera.position.y >= spire_y1 && camera.position.y <= spire_y1 + 2 &&
+		camera.position.z >= spire_z1 - 5 && camera.position.z <= spire_z1 + 5
+		&& !passenger_deliver_5 && passengerID == 5) // Drop off at resident
+	{
+		end_dialogue_5 = true;
+		if (spacestate)
+		{
+			passengerID = 0;
+			destination_5 = false;
+			passenger_deliver_5 = true;
+
+			cash += 10;
+			std::cout << passengerID << std::endl;
+		}
+	}
+	else
+	{
+		end_dialogue_5 = false;
+	}
+
+	// Restart
+	bool r_key = false;
+	if (Application::IsKeyPressed('R'))
+	{
+		r_key = true;
+	}
+
+	else
+	{
+		r_key = false;
+	}
+
+	if (passenger_deliver_1 && passenger_deliver_2 && passenger_deliver_3 && passenger_deliver_4 && passenger_deliver_5 && r_key)
+	{
+		// Reset scene
+		skybox_translateX = skybox_translateY = skybox_translateZ = 0.0f;
+		spire_passive_rotate = 0.0f;
+		cam_control = false;
+		taxi_rise_transition = 0;
+		pause = false;
+		cam_control = gamestart = true;
+
+		cash = 0;
+		// Spire locations
+
+		// Destination spires
+		spire_x1 = -65; spire_y1 = 0; spire_z1 = -35;	// Resident District
+		spire_x2 = 30; spire_y2 = 10; spire_z2 = -10;	// Hospital
+		spire_x3 = 20; spire_y3 = 0; spire_z3 = 85;	// Taxi Company
+		spire_x4 = -194; spire_y4 = 66; spire_z4 = 54;	// Commerical District
+		spire_x5 = -170; spire_y5 = 0; spire_z5 = -100;	// Mall
+
+		// Passenger spires
+		hospital_spire_x1 = 30; hospital_spire_y1 = 0;  hospital_spire_z1 = -20; // Hospital
+		commercial_spire_x2 = -100; commercial_spire_y2 = 0; commercial_spire_z2 = 100; // Commercial
+		residential1_spire_x3 = -50; residential1_spire_y3 = 0; residential1_spire_z3 = -35; // Residential 1
+		residential2_spire_x4 = -130; residential2_spire_y4 = 0; residential2_spire_z4 = -150; // Residential 2
+		mall_spire_x5 = -180; mall_spire_y5 = 0; mall_spire_z5 = -75; // Mall
+
+		value_store = speed_boost = lift_boost = side_hover = false;
+		dialogue_1 = dialogue_2 = dialogue_3 = dialogue_4 = dialogue_5 = false;
+		end_dialogue_1 = end_dialogue_2 = end_dialogue_3 = end_dialogue_4 = end_dialogue_5 = false;
+		passenger_deliver_1 = passenger_deliver_2 = passenger_deliver_3 = passenger_deliver_4 = passenger_deliver_5 = end_game = false;
+
+		// Reset camera
+		camera.position.x = 5;
+		camera.position.y = 1;
+		camera.position.z = 87.5;
+
+		camera.target.x = 7.5;
+		camera.target.y = 1;
+		camera.target.z = 85;
+
+		camera.up.x = 0;
+		camera.up.y = 1;
+		camera.up.z = 0;
+	}
 }
 
-void SceneTaxi::Render()
+void SceneYX::Render()
 {
 	// Render VBO here
 	//Clear color buffer every frame
@@ -547,13 +1035,13 @@ void SceneTaxi::Render()
 	viewStack.LookAt(camera.position.x, camera.position.y, camera.position.z, camera.target.x, camera.target.y, camera.target.z, camera.up.x, camera.up.y, camera.up.z);
 	modelStack.LoadIdentity();
 
-	RenderMesh(meshList[GEO_AXES], false);
+	//RenderMesh(meshList[GEO_AXES], false);
 	RenderSkybox();
 
 	modelStack.PushMatrix();
 	modelStack.Translate(light[0].position.x, light[0].position.y,
 		light[0].position.z);
-	RenderMesh(meshList[GEO_LIGHTBALL], false);
+	//xRenderMesh(meshList[GEO_LIGHTBALL], false);
 	modelStack.PopMatrix();
 
 	// Ground mesh
@@ -561,11 +1049,12 @@ void SceneTaxi::Render()
 	modelStack.Translate(-100, 0, 0);
 	modelStack.Rotate(-90, 1, 0, 0);
 	modelStack.Scale(300,500,500);
-	RenderMesh(meshList[GEO_QUAD], true);
+	RenderMesh(meshList[GEO_FLOOR], true);
 	modelStack.PopMatrix();
 
 	// Park
 
+	/*
 	modelStack.PushMatrix();
 	modelStack.Translate(-170, 0, -225);
 	//modelStack.Rotate(90, 0, 1, 0);
@@ -632,7 +1121,7 @@ void SceneTaxi::Render()
 	RenderMesh(meshList[GEO_PARK_PAD], false);
 	modelStack.PopMatrix();
 	modelStack.PopMatrix();
-
+	*/
 
 	// Roads
 	modelStack.PushMatrix();
@@ -675,120 +1164,233 @@ void SceneTaxi::Render()
 	//modelStack.Scale(3, 6, 3);
 	//modelStack.Rotate(-90, 0, 1, 0);
 	modelStack.Translate(20, 0, 75);
-	RenderMesh(meshList[GEO_TAXI_COMPANY], true);
+	RenderMesh(meshList[GEO_TAXI_COMPANY], true); // Tier 0
 
 	modelStack.PushMatrix();
 	modelStack.Translate(0, 0, 10);
 	modelStack.Scale(13, 0.5, 13);
-	RenderMesh(meshList[GEO_TAXI_PAD], false);
+	RenderMesh(meshList[GEO_TAXI_PAD], false); // Tier 1
 	for (int a = 0; a < 10; a++)
 	{
 		modelStack.PushMatrix();
 		modelStack.Scale(0.0769230769230, 2, 0.0769230769230);
 		modelStack.Translate(5.5f, 0.25, 6 - (1 * a));
 		modelStack.Rotate(-90, 0, 1, 0);
-		RenderMesh(meshList[GEO_TAXI], true);
+		RenderMesh(meshList[GEO_TAXI], true); // Tier 2
 		modelStack.PopMatrix();
 	}
+	//modelStack.PopMatrix();
+
+	//modelStack.PushMatrix();
+	//modelStack.Scale(0.0769230769230, 2, 0.0769230769230);
+	//modelStack.Translate(6, 0.25, -6);
+	//modelStack.Rotate(-45, 0, 1, 0);
+	//modelStack.Scale(0.1, 0.1, 0.1);
+	//modelStack.Scale(13, 0.5, 13);
+	//RenderMesh(meshList[GEO_ROBOT], true); // Tier 2
+
+	//modelStack.PopMatrix();
 	modelStack.PopMatrix();
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Translate(10, 0.1f, 85);
-	modelStack.Scale(20, 1, 5);
+	modelStack.Scale(25, 1, 5);
 	RenderMesh(meshList[GEO_ROAD], true);
 	modelStack.PopMatrix();
 
 	// Passengers //
 
-	modelStack.PushMatrix();
-	modelStack.Translate(30, 0, -20);
+	modelStack.PushMatrix(); // Hospital Pickup
+	modelStack.Translate(hospital_spire_x1, hospital_spire_y1, hospital_spire_z1);
 	modelStack.Scale(10, 1, 10);
 	RenderMesh(meshList[GEO_PASSENGERS_PAD_1], false);
 
-	modelStack.PushMatrix();
-	//modelStack.Translate(10, 0.1f, 85);
-	modelStack.Scale(0.1, 1000, 0.1);
-	modelStack.Rotate(spire_passive_rotate, 0, 1, 0);
-	RenderMesh(meshList[GEO_PASSENGERS_SPIRE_1], false);
+	if (!destination_1 && passengerID == 0 && !passenger_deliver_1)
+	{
+		modelStack.PushMatrix();
+		//modelStack.Translate(10, 0.1f, 85);
+		modelStack.Scale(0.1, 1000, 0.1);
+		modelStack.Rotate(spire_passive_rotate, 0, 1, 0);
+		RenderMesh(meshList[GEO_PASSENGERS_SPIRE_1], false);
 
+		modelStack.PopMatrix();
+	}
 	modelStack.PopMatrix();
+
+
+	modelStack.PushMatrix(); // Commercial Pickup
+	modelStack.Translate(commercial_spire_x2, commercial_spire_y2, commercial_spire_z2);
+	modelStack.Scale(10, 1, 10);
+	RenderMesh(meshList[GEO_PASSENGERS_PAD_2], false);
+
+	if (!destination_2 && passengerID == 0 && !passenger_deliver_2)
+	{
+		modelStack.PushMatrix();
+		//modelStack.Translate(10, 0.1f, 85);
+		modelStack.Scale(0.1, 1000, 0.1);
+		modelStack.Rotate(spire_passive_rotate, 0, 1, 0);
+		RenderMesh(meshList[GEO_PASSENGERS_SPIRE_2], false);
+
+		modelStack.PopMatrix();
+	}
+	modelStack.PopMatrix();
+
+
+	modelStack.PushMatrix(); // Resident Pickup 1
+	modelStack.Translate(residential1_spire_x3, residential1_spire_y3, residential1_spire_z3);
+	modelStack.Scale(10, 1, 10);
+	RenderMesh(meshList[GEO_PASSENGERS_PAD_3], false);
+
+	if (!destination_3 && passengerID == 0 && !passenger_deliver_3)
+	{
+		modelStack.PushMatrix();
+		//modelStack.Translate(10, 0.1f, 85);
+		modelStack.Scale(0.1, 1000, 0.1);
+		modelStack.Rotate(spire_passive_rotate, 0, 1, 0);
+		RenderMesh(meshList[GEO_PASSENGERS_SPIRE_3], false);
+
+		modelStack.PopMatrix();
+	}
+	modelStack.PopMatrix();
+
+
+	modelStack.PushMatrix(); // Resident Pickup 2
+	modelStack.Translate(residential2_spire_x4, residential2_spire_y4, residential2_spire_z4);
+	modelStack.Scale(10, 1, 10);
+	RenderMesh(meshList[GEO_PASSENGERS_PAD_4], false);
+
+	if (!destination_4 && passengerID == 0 && !passenger_deliver_4)
+	{
+		modelStack.PushMatrix();
+		//modelStack.Translate(10, 0.1f, 85);
+		modelStack.Scale(0.1, 1000, 0.1);
+		modelStack.Rotate(spire_passive_rotate, 0, 1, 0);
+		RenderMesh(meshList[GEO_PASSENGERS_SPIRE_4], false);
+
+		modelStack.PopMatrix();
+	}
+	modelStack.PopMatrix();
+
+
+	modelStack.PushMatrix(); // Mall Pickup
+	modelStack.Translate(mall_spire_x5, mall_spire_y5, mall_spire_z5);
+	modelStack.Scale(10, 1, 10);
+	RenderMesh(meshList[GEO_PASSENGERS_PAD_5], false);
+
+	if (!destination_5 && passengerID == 0 && !passenger_deliver_5)
+	{
+		modelStack.PushMatrix();
+		//modelStack.Translate(10, 0.1f, 85);
+		modelStack.Scale(0.1, 1000, 0.1);
+		modelStack.Rotate(spire_passive_rotate, 0, 1, 0);
+		RenderMesh(meshList[GEO_PASSENGERS_SPIRE_5], false);
+
+		modelStack.PopMatrix();
+	}
 	modelStack.PopMatrix();
 
 	// taxi
-	modelStack.PushMatrix();
-	modelStack.Translate(camera.up.x, camera.up.y, camera.up.z);
-	modelStack.Rotate(90, 0, 1, 0);
-	RenderMesh(meshList[GEO_TAXI], true);
+	if (!gamestart || upgrade)
+	{
+		modelStack.PushMatrix();
+		if (upgrade)
+		{
+			modelStack.Translate(20, 0.25, 85);
+		}
 
-	modelStack.PushMatrix();
-	modelStack.Scale(1, 0.4f, 1.75);
-	modelStack.Translate(0, 0.5, 0);
-	RenderMesh(meshList[GEO_HOVER], true);
+		else
+		{
+			modelStack.Translate(10, 0, 85);
+		}
+		modelStack.Rotate(-90, 0, 1, 0);
+		RenderMesh(meshList[GEO_TAXI], true);
 
-	modelStack.PopMatrix();
-	modelStack.PopMatrix();
+		modelStack.PushMatrix();
+		modelStack.Scale(1, 0.4f, 1.75);
+		modelStack.Translate(0, 0.5, 0);
+		RenderMesh(meshList[GEO_HOVER], true);
+
+		modelStack.PopMatrix();
+		modelStack.PopMatrix();
+	}
 
 	// SatNav Spires //
 
 	// Residential District Spire
-	modelStack.PushMatrix();
-	modelStack.Translate(spire_x1, spire_y1, spire_z1);
-	modelStack.Scale(1, 1000, 1);
-	modelStack.Rotate(spire_passive_rotate, 0, 1, 0);
-	RenderMesh(meshList[GEO_NAV_SPIRE], false);
-	modelStack.PopMatrix();
+	if (destination_2 && passengerID == 2 && !passenger_deliver_2 || destination_5 && passengerID == 5 && !passenger_deliver_5)
+	{
+		modelStack.PushMatrix();
+		modelStack.Translate(spire_x1, spire_y1, spire_z1);
+		modelStack.Scale(1, 1000, 1);
+		modelStack.Rotate(spire_passive_rotate, 0, 1, 0);
+		RenderMesh(meshList[GEO_NAV_SPIRE], false);
+		modelStack.PopMatrix();
+	}
 
 	// Hospital Spire
-	modelStack.PushMatrix();
-	modelStack.Translate(spire_x2, spire_y2, spire_z2);
-	modelStack.Scale(1, 1000, 1);
-	modelStack.Rotate(spire_passive_rotate, 0, 1, 0);
-	RenderMesh(meshList[GEO_NAV_SPIRE], false);
-	modelStack.PopMatrix();
+	if (destination_4 && passengerID == 4 && !passenger_deliver_4)
+	{
+		modelStack.PushMatrix();
+		modelStack.Translate(spire_x2, spire_y2, spire_z2);
+		modelStack.Scale(1, 1000, 1);
+		modelStack.Rotate(spire_passive_rotate, 0, 1, 0);
+		RenderMesh(meshList[GEO_NAV_SPIRE], false);
+		modelStack.PopMatrix();
+	}
 
-	// Taxi Company Spire (Different GEO)
-	modelStack.PushMatrix();
-	modelStack.Translate(spire_x3, spire_y3, spire_z3);
-	modelStack.Scale(1, 1000, 1);
-	modelStack.Rotate(spire_passive_rotate, 0, 1, 0);
-	RenderMesh(meshList[GEO_NAV_TAXI], false);
-	modelStack.PopMatrix();
+	// Taxi Company Spire (Upgrade interaction only)
+	if (!upgrade)
+	{
+		modelStack.PushMatrix();
+		modelStack.Translate(spire_x3, spire_y3, spire_z3);
+		modelStack.Scale(1, 1000, 1);
+		modelStack.Rotate(spire_passive_rotate, 0, 1, 0);
+		RenderMesh(meshList[GEO_NAV_TAXI], false);
+		modelStack.PopMatrix();
+	}
 
 	// Commercial District Spire
-	modelStack.PushMatrix();
-	modelStack.Translate(spire_x4, spire_y4, spire_z4);
-	modelStack.Scale(1, 1000, 1);
-	modelStack.Rotate(spire_passive_rotate, 0, 1, 0);
-	RenderMesh(meshList[GEO_NAV_SPIRE], false);
-	modelStack.PopMatrix();
+	if (destination_3 && passengerID == 3 && !passenger_deliver_3)
+	{
+		modelStack.PushMatrix();
+		modelStack.Translate(spire_x4, spire_y4, spire_z4);
+		modelStack.Scale(1, 1000, 1);
+		modelStack.Rotate(spire_passive_rotate, 0, 1, 0);
+		RenderMesh(meshList[GEO_NAV_SPIRE], false);
+		modelStack.PopMatrix();
+	}
 
 	// Mall District Spire
-	modelStack.PushMatrix();
-	modelStack.Translate(spire_x5, spire_y5, spire_z5);
-	modelStack.Scale(1, 1000, 1);
-	modelStack.Rotate(spire_passive_rotate, 0, 1, 0);
-	RenderMesh(meshList[GEO_NAV_SPIRE], false);
-	modelStack.PopMatrix();
+	if (destination_1 && passengerID == 1 && !passenger_deliver_1)
+	{
+		modelStack.PushMatrix();
+		modelStack.Translate(spire_x5, spire_y5, spire_z5);
+		modelStack.Scale(1, 1000, 1);
+		modelStack.Rotate(spire_passive_rotate, 0, 1, 0);
+		RenderMesh(meshList[GEO_NAV_SPIRE], false);
+		modelStack.PopMatrix();
+	}
+	
 
 	// Mall
 	modelStack.PushMatrix();
 	modelStack.Translate(-220, 0, -100);
-	modelStack.Scale(50,10,100);
+	modelStack.Scale(50,20,100);
 	RenderMesh(meshList[GEO_MALL], true);
 
 	modelStack.PushMatrix();
-	modelStack.Scale(0.02, 0.1, 0.01);
+	modelStack.Scale(0.02, 0.05, 0.01);
 	modelStack.Translate(25, 8, 0);
 	modelStack.Scale(1,2,10);
 	RenderMesh(meshList[GEO_MALL_SIGN], true);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Scale(0.02, 0.1, 0.01);
+	modelStack.Scale(0.02, 0.05, 0.01);
 	modelStack.Translate(50, 0, 0);
 	modelStack.Scale(30, 0.5, 30);
-	RenderMesh(meshList[GEO_MALL_SIGN], false);
+	RenderMesh(meshList[GEO_MALL_PAD], false);
 
 	modelStack.PopMatrix();
 	modelStack.PopMatrix();
@@ -917,11 +1519,219 @@ void SceneTaxi::Render()
 		modelStack.PopMatrix();
 	}
 
-	// Onscreen texy
-	RenderTextOnScreen(meshList[GEO_TEXT], "Destination: ", Color(0, 1, 0), 3, 0, 0);
+
+	// Onscreen text (UI)
+
+	// Passenger pcik up & drop off
+	if (camera.position.x >= hospital_spire_x1 - 5 && camera.position.x <= hospital_spire_x1 + 5 &&
+		camera.position.y >= hospital_spire_y1 && camera.position.y <= hospital_spire_y1 + 2 &&
+		camera.position.z >= hospital_spire_z1 - 5 && camera.position.z <= hospital_spire_z1 + 5
+		&& !passenger_deliver_1 && !destination_1 && passengerID == 0) // Pick up at hospital
+	{
+		RenderTextOnScreen(meshList[GEO_TEXT], "Pick Up Passenger Nurse?", Color(0, 1, 0), 2, 0, 10);
+	}
+
+	if (!pause || !upgrade)
+	{
+		if (destination_1)
+		{
+			RenderTextOnScreen(meshList[GEO_TEXT], "Mall", Color(0, 1, 0), 3, 38, 57);
+		}
+	}
+
+	if (camera.position.x >= spire_x5 - 5 && camera.position.x <= spire_x5 + 5 &&
+		camera.position.y >= spire_y5 && camera.position.y <= spire_y5 + 2 &&
+		camera.position.z >= spire_z5 - 5 && camera.position.z <= spire_z5 + 5
+		&& !passenger_deliver_1 && passengerID == 1) // Drop off at mall
+	{
+		RenderTextOnScreen(meshList[GEO_TEXT], "Drop off Passenger Nurse?", Color(0, 1, 0), 2, 0, 10);
+	}
+
+	//
+
+	if (camera.position.x >= commercial_spire_x2 - 5 && camera.position.x <= commercial_spire_x2 + 5 &&
+		camera.position.y >= commercial_spire_y2 && camera.position.y <= commercial_spire_y2 + 2 &&
+		camera.position.z >= commercial_spire_z2 - 5 && camera.position.z <= commercial_spire_z2 + 5
+		&& !passenger_deliver_2 && !destination_2 && passengerID == 0) // Pick up at commercial
+	{
+		RenderTextOnScreen(meshList[GEO_TEXT], "Pick Up Passenger Office Worker?", Color(0, 1, 0), 2, 0, 10);
+	}
+
+	if (!pause || !upgrade)
+	{
+		if (destination_2)
+		{
+			RenderTextOnScreen(meshList[GEO_TEXT], "Flats", Color(0, 1, 0), 3, 38, 57);
+		}
+	}
+
+	if (camera.position.x >= spire_x1 - 5 && camera.position.x <= spire_x1 + 5 &&
+		camera.position.y >= spire_y1 && camera.position.y <= spire_y1 + 2 &&
+		camera.position.z >= spire_z1 - 5 && camera.position.z <= spire_z1 + 5
+		&& !passenger_deliver_2 && passengerID == 2) // Drop off at resident
+	{
+		RenderTextOnScreen(meshList[GEO_TEXT], "Drop off Passenger Office Worker?", Color(0, 1, 0), 2, 0, 10);
+	}
+
+	//
+
+	if (camera.position.x >= residential1_spire_x3 - 5 && camera.position.x <= residential1_spire_x3 + 5 &&
+		camera.position.y >= residential1_spire_y3 && camera.position.y <= residential1_spire_y3 + 2 &&
+		camera.position.z >= residential1_spire_z3 - 5 && camera.position.z <= residential1_spire_z3 + 5
+		&& !passenger_deliver_3 && !destination_3 && passengerID == 0) // Pick up at resident 1
+	{
+		RenderTextOnScreen(meshList[GEO_TEXT], "Pick Up Passenger Secretary?", Color(0, 1, 0), 2, 0, 10);
+	}
+
+	if (!pause || !upgrade)
+	{
+		if (destination_3)
+		{
+			RenderTextOnScreen(meshList[GEO_TEXT], "CEO Tower", Color(0, 1, 0), 3, 38, 57);
+		}
+	}
+
+	if (camera.position.x >= spire_x4 - 5 && camera.position.x <= spire_x4 + 5 &&
+		camera.position.y >= spire_y4 && camera.position.y <= spire_y4 + 2 &&
+		camera.position.z >= spire_z4 - 5 && camera.position.z <= spire_z4 + 5
+		&& !passenger_deliver_3 && passengerID == 3) // Drop off at commercial
+	{
+		RenderTextOnScreen(meshList[GEO_TEXT], "Drop off Passenger Secretary?", Color(0, 1, 0), 2, 0, 10);
+	}
+
+	//
+
+	if (camera.position.x >= residential2_spire_x4 - 5 && camera.position.x <= residential2_spire_x4 + 5 &&
+		camera.position.y >= residential2_spire_y4 && camera.position.y <= residential2_spire_y4 + 2 &&
+		camera.position.z >= residential2_spire_z4 - 5 && camera.position.z <= residential2_spire_z4 + 5
+		&& !passenger_deliver_4 && !destination_4 && passengerID == 0) // Pick up at resident 2
+	{
+		RenderTextOnScreen(meshList[GEO_TEXT], "Pick Up Passenger Granny?", Color(0, 1, 0), 2, 0, 10);
+	}
+
+	if (!pause || !upgrade)
+	{
+		if (destination_4)
+		{
+			RenderTextOnScreen(meshList[GEO_TEXT], "Hospital", Color(0, 1, 0), 3, 38, 57);
+		}
+	}
+
+	if (camera.position.x >= spire_x2 - 5 && camera.position.x <= spire_x2 + 5 &&
+		camera.position.y >= spire_y2 && camera.position.y <= spire_y2 + 2 &&
+		camera.position.z >= spire_z2 - 5 && camera.position.z <= spire_z2 + 5
+		&& !passenger_deliver_4 && passengerID == 4) // Drop off at hospital
+	{
+		RenderTextOnScreen(meshList[GEO_TEXT], "Drop off Passenger Granny?", Color(0, 1, 0), 2, 0, 10);
+	}
+
+
+	if (camera.position.x >= mall_spire_x5 - 5 && camera.position.x <= mall_spire_x5 + 5 &&
+		camera.position.y >= mall_spire_y5 && camera.position.y <= mall_spire_y5 + 2 &&
+		camera.position.z >= mall_spire_z5 - 5 && camera.position.z <= mall_spire_z5 + 5
+		&& !passenger_deliver_5 && !destination_5 && passengerID == 0) // Pick up at mall
+	{
+		RenderTextOnScreen(meshList[GEO_TEXT], "Pick Up Passenger Mother?", Color(0, 1, 0), 2, 0, 10);
+	}
+
+	if (!pause || !upgrade)
+	{
+		if (destination_5)
+		{
+			RenderTextOnScreen(meshList[GEO_TEXT], "Flats", Color(0, 1, 0), 3, 38, 57);
+		}
+	}
+
+	if (camera.position.x >= spire_x1 - 5 && camera.position.x <= spire_x1 + 5 &&
+		camera.position.y >= spire_y1 && camera.position.y <= spire_y1 + 2 &&
+		camera.position.z >= spire_z1 - 5 && camera.position.z <= spire_z1 + 5
+		&& !passenger_deliver_5 && passengerID == 5) // Drop off at resident
+	{
+		RenderTextOnScreen(meshList[GEO_TEXT], "Drop off Passenger Mother?", Color(0, 1, 0), 2, 0, 10);
+	}
+
+
+
+
+	if (camera.position.x >= spire_x3 - 5 && camera.position.x <= spire_x3 + 5 &&
+		camera.position.y >= spire_y3 && camera.position.y <= spire_y3 + 2 &&
+		camera.position.z >= spire_z3 - 5 && camera.position.z <= spire_z3 + 5 &&
+		gamestart && !upgrade && !pause)
+	{
+		RenderTextOnScreen(meshList[GEO_TEXT], "Press U to upgrade", Color(0, 1, 0), 2, 0, 10);
+	}
+	// Taxi Company
+
+
+	// Other UIs
+	if (!cam_control && !gamestart)
+	{
+		RenderTextOnScreen(meshList[GEO_TEXT], "HoverTaxi Simulator", Color(0, 1, 0), 4, 2.5, 10);
+		RenderMeshOnScreen(meshList[GEO_QUAD], 39.75, 6.6f, 15, 3);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Start", Color(0, 1, 0), 3, 32.5, 5);
+	}
+
+	else if (cam_control)
+	{
+		/*if (passengerID == 1)
+		{
+			RenderTextOnScreen(meshList[GEO_TEXT], "Destination: CEO Tower", Color(0, 1, 0), 3, 0, 0);
+		}
+		*/
+		RenderTextOnScreen(meshList[GEO_TEXT], "Destination: ", Color(0, 1, 0), 3, 0, 57);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Cash: $" + std::to_string(cash), Color(0, 1, 0), 3, 0, 54);
+	}
+
+	if (pause && gamestart)
+	{
+		RenderTextOnScreen(meshList[GEO_TEXT], "Game Paused", Color(0, 1, 0), 4, 2, 10);
+		RenderMeshOnScreen(meshList[GEO_QUAD], 1.5, 6.6f, 35, 3);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Resume", Color(0, 1, 0), 3, 1, 5);
+	}
+
+	if (upgrade && gamestart)
+	{
+		RenderTextOnScreen(meshList[GEO_TEXT], "Upgrades", Color(0, 1, 0), 3, 0, 57);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Cash: $" + std::to_string(cash), Color(0, 1, 0), 3, 0, 54);
+		
+		RenderMeshOnScreen(meshList[GEO_QUAD], 3.5, 11.5, 3, 3);
+		RenderMeshOnScreen(meshList[GEO_QUAD], 3.5, 14.5, 3, 3);
+		RenderMeshOnScreen(meshList[GEO_QUAD], 3.5, 17.5, 3, 3);
+		RenderTextOnScreen(meshList[GEO_TEXT], "  Speed boost: $20", Color(0, 1, 0), 3, 2, 10);
+		RenderTextOnScreen(meshList[GEO_TEXT], "  Hover boost: $10", Color(0, 1, 0), 3, 2, 13);
+		RenderTextOnScreen(meshList[GEO_TEXT], "  Side thrusters: $10", Color(0, 1, 0), 3, 2, 16);
+
+		if (side_hover)
+		{
+			RenderTextOnScreen(meshList[GEO_TEXT], "X", Color(0, 1, 0), 3, 2, 10);
+		}
+
+		if (lift_boost)
+		{
+			RenderTextOnScreen(meshList[GEO_TEXT], "X", Color(0, 1, 0), 3, 2, 13);
+		}
+
+		if (speed_boost)
+		{
+			RenderTextOnScreen(meshList[GEO_TEXT], "X", Color(0, 1, 0), 3, 2, 16);
+
+		}
+		
+		
+		RenderMeshOnScreen(meshList[GEO_QUAD], 1.5, 6.6f, 35, 3);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Exit", Color(0, 1, 0), 3, 1, 5);
+	}
+
+	if (passenger_deliver_1 && passenger_deliver_2 && passenger_deliver_3 && passenger_deliver_4 && passenger_deliver_5)
+	{
+		RenderTextOnScreen(meshList[GEO_TEXT], "All passengers delivered", Color(0, 1, 0), 2, 2.5, 14);
+		RenderTextOnScreen(meshList[GEO_TEXT], "You may head to either sides of the map", Color(0, 1, 0), 2, 2.5, 10);
+		RenderTextOnScreen(meshList[GEO_TEXT], "to visit other scenes", Color(0, 1, 0), 2, 2.5, 8);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Or press R to restart", Color(0, 1, 0), 2, 2.5, 4);
+	}
 }
 
-void SceneTaxi::Exit()
+void SceneYX::Exit()
 {
 	// Cleanup VBO here
 	//glDeleteBuffers(NUM_GEOMETRY, &m_vertexBuffer[0]);
@@ -930,7 +1740,7 @@ void SceneTaxi::Exit()
 	glDeleteProgram(m_programID);
 }
 
-void SceneTaxi::RenderMesh(Mesh* mesh, bool enableLight)
+void SceneYX::RenderMesh(Mesh* mesh, bool enableLight)
 {
 	Mtx44 MVP, modelView, modelView_inverse_transpose;
 	//enableLight = false;
@@ -972,66 +1782,56 @@ void SceneTaxi::RenderMesh(Mesh* mesh, bool enableLight)
 	}
 }
 
-void SceneTaxi::RenderSkybox()
+void SceneYX::RenderSkybox()
 {
 	modelStack.PushMatrix();
-	modelStack.Translate(skybox_translateX, skybox_translateY, skybox_translateZ);
-	modelStack.Scale(1000, 1000, 1000);
+	modelStack.Scale(600, 600, 600);
 	modelStack.Translate(0, 0.f, 0.5);
-	modelStack.Rotate(0, 1, 0, 0);
-	//modelStack.Rotate(180, 0, 0, 1);
+	modelStack.Rotate(180, 1, 0, 0);
+	modelStack.Rotate(180, 0, 0, 1);
 	RenderMesh(meshList[GEO_FRONT], false);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(skybox_translateX, skybox_translateY, skybox_translateZ);
-	modelStack.Scale(1000, 1000, 1000);
+	modelStack.Scale(600, 600, 600);
 	modelStack.Translate(-0.5, 0.f, 0);
-	modelStack.Rotate(0, 1, 0, 0);
-	modelStack.Rotate(-90, 0, 1, 0);
-	//modelStack.Rotate(180, 0, 0, 1);
+	modelStack.Rotate(90, 0, 1, 0);
 	RenderMesh(meshList[GEO_RIGHT], false);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(skybox_translateX, skybox_translateY, skybox_translateZ);
-	modelStack.Scale(1000, 1000, 1000);
+	modelStack.Scale(600, 600, 600);
 	modelStack.Translate(0.5, 0.f, 0);
-	modelStack.Rotate(0, 1, 0, 0);
-	modelStack.Rotate(90, 0, 1, 0);
-	//modelStack.Rotate(180, 0, 0, 1);
+	modelStack.Rotate(-90, 0, 1, 0);
 	RenderMesh(meshList[GEO_LEFT], false);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(skybox_translateX, skybox_translateY, skybox_translateZ);
-	modelStack.Scale(1000, 1000, 1000);
+	modelStack.Scale(600, 600, 600);
 	modelStack.Translate(0, 0.5f, 0);
-	modelStack.Rotate(-90, 1, 0, 0);
-	modelStack.Rotate(180, 0, 0, 1);
+	modelStack.Rotate(90, 1, 0, 0);
+	modelStack.Rotate(-90, 0, 0, 1);
 	RenderMesh(meshList[GEO_TOP], false);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(skybox_translateX, skybox_translateY, skybox_translateZ);
-	modelStack.Scale(1000, 1000, 1000);
+	modelStack.Scale(600, 600, 600);
 	modelStack.Translate(0, -0.5f, 0);
-	modelStack.Rotate(90, 1, 0, 0);
-	modelStack.Rotate(180, 0, 0, 1);
+	modelStack.Rotate(-90, 1, 0, 0);
+	modelStack.Rotate(90, 0, 0, 1);
 	RenderMesh(meshList[GEO_BOTTOM], false);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(skybox_translateX, skybox_translateY, skybox_translateZ);
-	modelStack.Scale(1000, 1000, 1000);
+	modelStack.Scale(600, 600, 600);
 	modelStack.Translate(0, 0.f, -0.5);
-	modelStack.Rotate(0, 1, 0, 0);
-	modelStack.Rotate(180, 0, 1, 0);
+	modelStack.Rotate(180, 0, 0, 1);
+	modelStack.Rotate(180, 0, 0, 1);
 	RenderMesh(meshList[GEO_BACK], false);
 	modelStack.PopMatrix();
 }
 
-void SceneTaxi::RenderText(Mesh* mesh, std::string text, Color color)
+void SceneYX::RenderText(Mesh* mesh, std::string text, Color color)
 {
 	if (!mesh || mesh->textureID <= 0) //Proper error check
 		return;
@@ -1056,7 +1856,7 @@ void SceneTaxi::RenderText(Mesh* mesh, std::string text, Color color)
 	glEnable(GL_DEPTH_TEST);
 }
 
-void SceneTaxi::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y)
+void SceneYX::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y)
 {
 	if (!mesh || mesh->textureID <= 0) //Proper error check
 		return;
@@ -1094,7 +1894,7 @@ void SceneTaxi::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, fl
 	glEnable(GL_DEPTH_TEST);
 }
 
-void SceneTaxi::RenderMeshOnScreen(Mesh* mesh, int x, int y, int sizex, int sizey)
+void SceneYX::RenderMeshOnScreen(Mesh* mesh, int x, int y, int sizex, int sizey)
 {
 	glDisable(GL_DEPTH_TEST);
 	Mtx44 ortho;

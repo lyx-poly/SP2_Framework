@@ -1,33 +1,47 @@
 ﻿  SceneYX.cpp
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(154,88): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(578,26): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(583,26): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(588,26): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(593,26): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(609,26): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(614,26): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(619,26): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(624,26): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(687,55): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(688,38): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(711,33): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(781,34): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(788,34): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(805,31): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(806,33): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(812,33): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(813,33): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(820,32): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(879,28): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(887,28): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(906,28): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(914,28): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1108,26): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1108,23): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1109,26): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1109,19): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(184,88): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(505,14): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(506,14): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(560,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(561,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(635,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(636,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1176,55): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1177,38): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1213,34): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1231,34): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1249,34): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1267,34): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1285,34): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1383,35): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1390,35): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1407,31): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1408,33): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1414,33): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1415,33): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1422,32): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1481,28): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1489,28): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1508,28): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1516,28): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1670,49): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1670,42): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1688,47): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1688,42): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1697,47): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1697,42): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1698,47): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1698,42): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1699,47): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1699,42): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1721,47): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1721,42): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1908,26): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1908,23): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1909,26): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\rogue\Documents\Poly\Year 1 S2\DM2197 Studio Project 2\Forked Framework\SP2_Framework\SP2\Application\Source\SceneYX.cpp(1909,19): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
   Generating code
-  1 of 916 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+  1 of 930 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     3 functions had inline decision re-evaluated but remain unchanged
   Finished generating code

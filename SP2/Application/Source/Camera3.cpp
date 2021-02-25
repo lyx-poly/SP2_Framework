@@ -92,6 +92,7 @@ void Camera3::Update(double dt)
         target = position + view;
     }*/
     
+    
     if (Application::IsKeyPressed('A'))
     {
         /*Vector3 right = view.Cross(up).Normalized();

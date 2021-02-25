@@ -22,6 +22,9 @@ class SceneYX : public Scene
 		GEO_QUAD3,
 		GEO_LIGHTBALL,
 
+		// Collision boxes
+		GEO_BOX,
+
 		// SatNav Spires
 		GEO_NAV_SPIRE,
 		GEO_NAV_TAXI, // Deport / Taxi Company

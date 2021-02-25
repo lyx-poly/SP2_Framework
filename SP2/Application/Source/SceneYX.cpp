@@ -90,6 +90,8 @@ void SceneYX::Init()
 	meshList[GEO_QUAD]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
 	meshList[GEO_QUAD]->material.kShininess = 0.2f;
 
+	meshList[GEO_BOX] = MeshBuilder::GenerateCube("reference", Color(0, 1, 0), 1);
+
 	meshList[GEO_LIGHTBALL] = MeshBuilder::GenerateSphere("sphere", Color(1,1,1), 18, 18, 1.0f);
 
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("Destination text", 16, 16);
@@ -101,8 +103,8 @@ void SceneYX::Init()
 
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("reference", 1500, 1500, 1500);
 
-	meshList[GEO_NAV_SPIRE] = MeshBuilder::GenerateCube("reference", Color(0,1,0), 1);
-	meshList[GEO_NAV_TAXI] = MeshBuilder::GenerateCube("reference", Color(1, 1, 0), 1);
+	meshList[GEO_NAV_SPIRE] = MeshBuilder::GenerateCube("SatNAv Spire", Color(0,1,0), 1);
+	meshList[GEO_NAV_TAXI] = MeshBuilder::GenerateCube("taxi company spire", Color(1, 1, 0), 1);
 
 	// Road
 	meshList[GEO_ROAD] = MeshBuilder::GenerateOBJMTL("Taxi", "OBJ//road_straight.obj", "OBJ//road_straight.mtl");

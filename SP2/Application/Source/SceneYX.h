@@ -119,10 +119,10 @@ class SceneYX : public Scene
 		GEO_MALL_PAD,
 
 		// Park 
-		GEO_TREE1,
-		GEO_TREE2,
-		GEO_TREE3,
-		GEO_TREE4,
+		//GEO_TREE1,
+		//GEO_TREE2,
+		//GEO_TREE3,
+		//GEO_TREE4,
 
 		GEO_PARK_PAD,
 

@@ -39,7 +39,7 @@ SceneYX::SceneYX()
 	value_store = speed_boost = lift_boost = side_hover = false;
 	dialogue_1 = dialogue_2 = dialogue_3 = dialogue_4 = dialogue_5 = false;
 	end_dialogue_1 = end_dialogue_2 = end_dialogue_3 = end_dialogue_4 = end_dialogue_5 = false;
-	passenger_deliver_1 = passenger_deliver_2 = passenger_deliver_3 = passenger_deliver_4 = passenger_deliver_5 = end_game = true;
+	passenger_deliver_1 = passenger_deliver_2 = passenger_deliver_3 = passenger_deliver_4 = passenger_deliver_5 = end_game = false;
 }
 
 SceneYX::~SceneYX()
@@ -198,10 +198,10 @@ void SceneYX::Init()
 	meshList[GEO_MALL_PAD] = MeshBuilder::GenerateCube("Placeholder Mall Pad", Color(0.75, 1, 0.75), 1.0f);
 
 	// Park
-	meshList[GEO_TREE1] = MeshBuilder::GenerateOBJMTL("Tree 1", "OBJ//tree_pineTallA_detailed.obj", "OBJ//tree_pineTallA_detailed.mtl");
-	meshList[GEO_TREE2] = MeshBuilder::GenerateOBJMTL("Tree 2", "OBJ//tree_pineTallB_detailed.obj", "OBJ//tree_pineTallB_detailed.mtl");
-	meshList[GEO_TREE3] = MeshBuilder::GenerateOBJMTL("Tree 3", "OBJ//tree_pineTallC_detailed.obj", "OBJ//tree_pineTallC_detailed.mtl");
-	meshList[GEO_TREE4] = MeshBuilder::GenerateOBJMTL("Tree 4", "OBJ//tree_pineTallD_detailed.obj", "OBJ//tree_pineTallD_detailed.mtl");
+	//meshList[GEO_TREE1] = MeshBuilder::GenerateOBJMTL("Tree 1", "OBJ//tree_pineTallA_detailed.obj", "OBJ//tree_pineTallA_detailed.mtl");
+	//meshList[GEO_TREE2] = MeshBuilder::GenerateOBJMTL("Tree 2", "OBJ//tree_pineTallB_detailed.obj", "OBJ//tree_pineTallB_detailed.mtl");
+	//meshList[GEO_TREE3] = MeshBuilder::GenerateOBJMTL("Tree 3", "OBJ//tree_pineTallC_detailed.obj", "OBJ//tree_pineTallC_detailed.mtl");
+	//meshList[GEO_TREE4] = MeshBuilder::GenerateOBJMTL("Tree 4", "OBJ//tree_pineTallD_detailed.obj", "OBJ//tree_pineTallD_detailed.mtl");
 
 	meshList[GEO_PARK_PAD] = MeshBuilder::GenerateCube("Park Landing platform", Color(0, 0.25f, 0), 1.0f);
 
